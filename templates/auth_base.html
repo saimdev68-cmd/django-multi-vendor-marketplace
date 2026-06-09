@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketly | {% block title %}{% endblock %}</title>
+    
+    <link rel="shortcut icon" href="{% static 'images/Marketly.png' %}" type="image/png">
+    <link rel="stylesheet" href="{% static 'css/auth_style.css' %}">
+</head>
+<body>
+
+    <div id="toast-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="toast-card toast-{{ message.tags }}">
+                    <div class="toast-content">{{ message }}</div>
+                    <button class="toast-close" onclick="dismissToast(this)">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="auth-container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="{% static 'js/auth_script.js' %}"></script>
+</body>
+</html>

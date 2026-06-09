@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Products{% endblock %}
+
+{% block content %}
+
+<h2>All Products</h2>
+<hr>
+
+<div class="row">
+
+    {% for product in products %}
+    <div class="col-md-3 mb-3">
+
+        <div class="card h-100">
+
+            {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" style="height:200px; object-fit:cover;">
+            {% endif %}
+
+            <div class="card-body">
+                <h5>{{ product.name }}</h5>
+                <p>${{ product.final_price }}</p>
+                <p><small>{{ product.vendor.store_name }}</small></p>
+
+                <a href="{% url 'product-detail' product.slug %}" class="btn btn-primary btn-sm">
+                    View
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+    {% endfor %}
+
+</div>
+
+{% endblock %}

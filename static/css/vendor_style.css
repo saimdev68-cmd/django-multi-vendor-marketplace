@@ -1,0 +1,962 @@
+:root {
+    --primary: #0f172a;
+    --primary-light: #1e293b;
+    --accent: #2563eb;
+    --bg: #f8fafc;
+    --card-bg: #ffffff;
+    --text-main: #334155;
+    --text-dark: #0f172a;
+    --text-muted: #94a3b8;
+    --border: #e2e8f0;
+    --radius: 12px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Dynamic layout variables controlled via JS toggle toggles */
+    --sidebar-width: 260px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+.dashboard-container {
+    display: flex;
+    flex: 1;
+    position: relative;
+}
+
+/* ---------------------------------- */
+/* PREMIUM COLLAPSIBLE SIDEBAR CODE    */
+/* ---------------------------------- */
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--card-bg);
+    border-right: 1px solid var(--border);
+    padding: 24px 14px;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    height: 100vh;
+    transition: var(--transition);
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Sidebar Minimized State Utilities */
+.sidebar.minimized {
+    --sidebar-width: 78px;
+    padding: 24px 10px;
+}
+
+/* ---------------------------------- */
+/* LOGO HEADER & COLLAPSE TRIGGER BAR */
+/* ---------------------------------- */
+.sidebar-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+    position: relative;
+}
+
+.brand-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Perfectly Centered Logo */
+    height: 44px;
+    width: 100%;
+    transition: var(--transition);
+}
+
+.brand-logo img {
+    max-width: 85%;
+    max-height: 38px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    transition: var(--transition);
+}
+
+/* Scaled down thumbnail sizing rule when navbar is collapsed */
+.sidebar.minimized .brand-logo img {
+    max-height: 28px;
+    max-width: 100%;
+}
+
+/* Premium 3-Line Modern Menu Collapse Button Element */
+.collapse-trigger-btn {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-dark);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 14px;
+}
+
+.collapse-trigger-btn:hover {
+    background: var(--border);
+    color: var(--accent);
+}
+
+/* ---------------------------------- */
+/* SIDEBAR NAVIGATION LINKS SCALING   */
+/* ---------------------------------- */
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: space-between;
+}
+
+.nav-menu {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.nav-item {
+    position: relative;
+}
+
+.nav-link, .logout-btn {
+    display: flex;
+    align-items: center;
+    padding: 12px 14px;
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px;
+    background: none;
+    border: none;
+    width: 100%;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.nav-link i, .logout-btn i {
+    font-size: 16px;
+    color: var(--text-muted);
+    transition: var(--transition);
+    min-width: 24px;
+    text-align: center;
+}
+
+/* Link Text Containers for Smooth Fade Effects */
+.link-text {
+    opacity: 1;
+    margin-left: 10px;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    display: inline-block;
+}
+
+/* Hides Link Descriptions perfectly when minimized layout is triggered */
+.sidebar.minimized .link-text {
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    transform: translateX(10px);
+}
+
+/* Adjust internal alignment configurations for centered iconography */
+.sidebar.minimized .nav-link, 
+.sidebar.minimized .logout-btn {
+    justify-content: center;
+    padding: 12px 0;
+}
+
+.nav-link:hover, .logout-btn:hover {
+    background: var(--bg);
+    color: var(--text-dark);
+}
+
+.nav-link:hover i, .logout-btn:hover i {
+    color: var(--text-dark);
+}
+
+/* ---------------------------------- */
+/* PREMIUM ACTIVE HIGH-LIGHT SLIDER   */
+/* ---------------------------------- */
+.nav-item::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 20%;
+    height: 60%;
+    width: 4px;
+    background: var(--accent);
+    border-radius: 0 4px 4px 0;
+    transform: scaleY(0);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-item.active::before {
+    transform: scaleY(1);
+}
+
+.nav-item.active .nav-link {
+    background: rgba(37, 99, 235, 0.06);
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.nav-item.active .nav-link i {
+    color: var(--accent);
+}
+
+/* Logout Section Layout */
+.logout-form-wrapper {
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    margin-top: auto;
+}
+
+.logout-btn {
+    color: #ef4444;
+}
+
+.logout-btn i {
+    color: #f87171;
+}
+
+.logout-btn:hover {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.logout-btn:hover i {
+    color: #b91c1c;
+}
+
+/* ---------------------------------- */
+/* CONTENT AND WORKSPACE STRUCTURES   */
+/* ---------------------------------- */
+.main-content {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 100vh;
+    transition: var(--transition);
+}
+
+/* Adaptive adjustments inside parent elements when tracking script actions triggers variables changes */
+body:has(.sidebar.minimized) .main-content {
+    margin-left: 78px;
+}
+
+.workspace-panel {
+    padding: 40px;
+    flex: 1;
+}
+
+.panel-header {
+    margin-bottom: 24px;
+}
+
+.panel-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+/* Footer System */
+.panel-footer {
+    background: var(--card-bg);
+    border-top: 1px solid var(--border);
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.panel-footer a {
+    color: var(--text-muted);
+    text-decoration: none;
+    margin-left: 16px;
+    transition: var(--transition);
+}
+
+.panel-footer a:hover {
+    color: var(--accent);
+}
+
+/* Mobile Layout Top bar config styles */
+.mobile-top-bar {
+    display: none;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    padding: 16px;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 101;
+}
+
+.mobile-menu-toggle {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: var(--text-dark);
+    cursor: pointer;
+}
+
+/* ---------------------------------- */
+/* WIRE INTERACTIVE MOBILE OVERRIDES  */
+/* ---------------------------------- */
+@media (max-width: 991px) {
+    .sidebar {
+        transform: translateX(-100%);
+        width: 260px !important; /* Force full visual dimensions inside overlay drawer elements */
+    }
+    
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .sidebar .link-text {
+        opacity: 1 !important;
+        position: static !important;
+        transform: none !important;
+    }
+
+    .sidebar .nav-link, .sidebar .logout-btn {
+        justify-content: flex-start !important;
+        padding: 12px 14px !important;
+    }
+
+    .sidebar-header {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .sidebar-header .collapse-trigger-btn {
+        display: none; /* Hide internal desktop toggle switch layout inside mobile sizes */
+    }
+
+    .main-content, body:has(.sidebar.minimized) .main-content {
+        margin-left: 0;
+    }
+
+    .mobile-top-bar {
+        display: flex;
+    }
+
+    .workspace-panel {
+        padding: 24px 16px;
+    }
+
+    .panel-footer {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+        padding: 20px 16px;
+    }
+    
+    .panel-footer div {
+        margin-left: 0;
+    }
+}
+
+/* ---------------------------------- */
+/* DASHBOARD CONTENT LAYOUT UTILITIES */
+/* ---------------------------------- */
+.dashboard-view-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    width: 100%;
+    max-width: 100%; /* Prevents horizontal overflowing */
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* Filter Toolbar Header Alignments */
+.dashboard-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.welcome-text h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.welcome-text p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* Premium Dropdown Input Styles */
+.filter-select-wrapper {
+    position: relative;
+}
+
+.filter-select {
+    appearance: none;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 10px 36px 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-dark);
+    border-radius: 8px;
+    cursor: pointer;
+    outline: none;
+    transition: var(--transition);
+}
+
+.filter-select:hover, .filter-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.filter-select-wrapper::after {
+    content: '\f107';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+/* ---------------------------------- */
+/* OVERVIEW STATS METRIC GRID SYSTEM  */
+/* ---------------------------------- */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    width: 100%;
+}
+
+.metric-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: var(--transition);
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    border-color: #cbd5e1;
+    box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.04);
+}
+
+.metric-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.metric-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+}
+
+.metric-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.metric-icon-box {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.review-stars-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #f59e0b;
+    margin-top: 2px;
+}
+
+.review-stars-wrapper span {
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-left: 2px;
+}
+
+.box-sales { background: rgba(37, 99, 235, 0.08); color: var(--accent); }
+.box-orders { background: rgba(16, 185, 129, 0.08); color: #10b981; }
+.box-products { background: rgba(245, 158, 11, 0.08); color: #f59e0b; }
+.box-payouts { background: rgba(139, 92, 246, 0.08); color: #8b5cf6; }
+
+/* ---------------------------------- */
+/* RESPONSIVE GRAPH LAYOUT DESIGN     */
+/* ---------------------------------- */
+.charts-split-layout-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    width: 100%;
+}
+
+.chart-container-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    width: 100%;
+    min-width: 0; /* Prevents flex items from breaking grid boundaries */
+}
+
+.chart-card-header {
+    margin-bottom: 20px;
+}
+
+.chart-card-header h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+/* CRUCIAL CHART LAYER: Dynamic viewport containment sizing */
+.chart-wrapper-canvas {
+    position: relative;
+    width: 100%;
+    height: 300px; /* Base height for wide desktop frames */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------------------------------- */
+/* ULTRALIGHT ADAPTIVE MEDIA QUERIES  */
+/* ---------------------------------- */
+@media (max-width: 1199px) {
+    .chart-wrapper-canvas {
+        height: 260px; /* Compress height slightly on small laptops/tablets */
+    }
+}
+
+@media (max-width: 991px) {
+    .charts-split-layout-grid {
+        grid-template-columns: 1fr; /* Stack charts vertically */
+        gap: 20px;
+    }
+    
+    .chart-wrapper-canvas {
+        height: 280px; /* Restore perfect height when charts stack to full width */
+    }
+}
+
+@media (max-width: 600px) {
+    .dashboard-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .filter-select-wrapper {
+        width: 100%;
+    }
+    .filter-select {
+        width: 100%;
+    }
+    .chart-container-card {
+        padding: 16px; /* Tighten up spacing for extra mobile real estate */
+    }
+    .chart-wrapper-canvas {
+        height: 220px; /* Optimized layout tracking on tiny smartphone frames */
+    }
+}
+
+
+/* ---------------------------------- */
+    /* PREMIUM SAAS PROFILE WORKSPACE     */
+    /* ---------------------------------- */
+.profile-view-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    width: 100%;
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* ---------------------------------- */
+/* HERO BRANDING HERO CAPTURE AREA    */
+/* ---------------------------------- */
+.brand-hero-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    position: relative;
+}
+
+.hero-banner-frame {
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
+    position: relative;
+    cursor: zoom-in; /* Indicates image is expandable */
+    overflow: hidden;
+}
+
+.hero-banner-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.hero-banner-frame:hover img {
+    transform: scale(1.02); /* Subtle premium swell effect */
+}
+
+/* Overlapping Interactive Profile Identity Row */
+.brand-identity-row {
+    padding: 0 32px 28px 32px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    position: relative;
+    margin-top: -60px;
+}
+
+.identity-left-pod {
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.brand-logo-avatar {
+    width: 120px;
+    height: 120px;
+    background: var(--card-bg);
+    border: 4px solid var(--card-bg);
+    border-radius: 50%;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-in; /* Indicates image is expandable */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.brand-logo-avatar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px -3px rgba(15, 23, 42, 0.12);
+}
+
+.brand-logo-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.brand-logo-placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--primary);
+    color: #ffffff;
+    font-size: 36px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.identity-meta-text {
+    padding-bottom: 8px;
+}
+
+.identity-meta-text h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.verified-badge {
+    color: var(--accent);
+    font-size: 18px;
+}
+
+.action-button-group {
+    padding-bottom: 8px;
+}
+
+.btn-edit-profile {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.btn-edit-profile:hover {
+    background: var(--bg);
+    color: var(--text-dark);
+    border-color: #cbd5e1;
+}
+
+/* ---------------------------------- */
+/* META LAYOUT COLUMNS GRID COMPONENT */
+/* ---------------------------------- */
+.profile-split-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.details-main-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.info-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+}
+
+.info-card h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.info-card h3 i {
+    color: var(--text-muted);
+    font-size: 15px;
+}
+
+.info-card p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-main);
+}
+
+.meta-list-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+}
+
+.meta-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.meta-label {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.meta-value {
+    color: var(--text-dark);
+    font-weight: 600;
+    text-align: right;
+}
+
+.status-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 99px;
+    text-transform: capitalize;
+}
+
+.status-active { background: #ecfdf5; color: #10b981; }
+.status-pending { background: #fffbeb; color: #d97706; }
+.status-suspended { background: #fef2f2; color: #ef4444; }
+.status-rejected { background: #f8fafc; color: #64748b; }
+
+/* ---------------------------------- */
+/* MODERN LIGHTBOX MODAL OVERLAY      */
+/* ---------------------------------- */
+.lightbox-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(15, 23, 42, 0.6); /* Translucent dark slate overlay */
+    backdrop-filter: blur(8px); /* High-end SaaS blur filter */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; /* Stay structural on top of everything */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    padding: 24px;
+}
+
+.lightbox-modal.is-active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.lightbox-content {
+    max-width: 85%;
+    max-height: 80vh;
+    position: relative;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.lightbox-modal.is-active .lightbox-content {
+    transform: scale(1);
+}
+
+.lightbox-image {
+    max-width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+    background-color: var(--card-bg);
+}
+
+.lightbox-close {
+    position: absolute;
+    top: -48px;
+    right: 0;
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 991px) {
+    .profile-split-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .brand-identity-row {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        margin-top: -50px;
+        padding: 0 16px 20px 16px;
+    }
+    
+    .identity-left-pod {
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .identity-meta-text h2 {
+        justify-content: center;
+    }
+
+    .action-button-group, .btn-edit-profile {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .lightbox-content {
+        max-width: 100%;
+    }
+}

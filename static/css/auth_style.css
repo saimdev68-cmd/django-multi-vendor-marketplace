@@ -1,0 +1,408 @@
+/* Google Fonts for a clean SaaS aesthetic */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --bg-main: #f4f7fa;
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    
+    /* NEW: Dark Slate/Navy Gradient directly from your image header */
+    --primary-gradient: linear-gradient(180deg, #465666 0%, #2a3540 100%);
+    /* NEW: Darker shade for a smooth focus/hover state */
+    --primary-hover-bg: linear-gradient(180deg, #384654 0%, #1e262f 100%);
+    
+    --border-color: #e2e8f0;
+    --input-focus: #3b82f6;
+    --error-color: #ef4444;
+    --success-color: #10b981;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.auth-container {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 440px; 
+    padding: 40px;
+    text-align: center;
+}
+
+.auth-logo {
+    margin-bottom: 24px;
+    object-fit: contain;
+}
+
+.auth-container h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+
+.auth-subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+}
+
+.auth-form p {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.auth-form label {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+
+/* Wrapper to position the eye icon inside the password box */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.auth-form input[type="text"],
+.auth-form input[type="email"],
+.auth-form input[type="password"],
+.auth-form input[type="number"] {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: #fafafa;
+    color: var(--text-main);
+    /* Smooth transition to prevent hard "blinking" cuts */
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    outline: none;
+}
+
+/* Ensure padding-right accommodates the eye icon inside password fields */
+.password-wrapper input {
+    padding-right: 46px !important;
+}
+
+.auth-form input:focus {
+    border-color: var(--input-focus);
+    background-color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+/* Fix for "Register as Vendor" Checkbox Alignment */
+.auth-form p:has(input[type="checkbox"]) {
+    display: flex;
+    flex-direction: row-reverse; /* Puts the checkbox box in front of the text label */
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px; /* Clean spacing between box and text */
+    margin-top: 12px;
+    margin-bottom: 24px;
+}
+
+/* Removes the default bottom spacing on the checkbox label when inline */
+.auth-form p:has(input[type="checkbox"]) label {
+    margin-bottom: 0;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
+    user-select: none;
+}
+
+/* Premium SaaS look for the checkbox element */
+.auth-form input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #465666; /* Matches your premium dark slate theme button color */
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Smooth micro-interaction on hover */
+.auth-form input[type="checkbox"]:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 3px rgba(70, 86, 102, 0.1);
+}
+
+/* Interactive Eye Icon Button */
+.password-toggle-btn {
+    position: absolute;
+    right: 14px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    transition: color 0.2s ease;
+}
+
+.password-toggle-btn:hover {
+    color: var(--text-main);
+}
+
+.password-toggle-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Form Error Messaging */
+.errorlist {
+    list-style: none;
+    color: var(--error-color);
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 6px;
+    text-align: left;
+}
+
+.non-field-errors {
+    background-color: #fef2f2;
+    border: 1px solid #fca5a5;
+    padding: 12px;
+    border-radius: 8px;
+    color: var(--error-color);
+    font-size: 14px;
+    margin-bottom: 20px;
+    text-align: left;
+    list-style: none;
+}
+
+/* Modern Gradient Action Button with Image Theme Colors */
+.btn-submit {
+    width: 100%;
+    padding: 14px;
+    background: var(--primary-gradient);
+    color: #ffffff; /* Clean white text color exactly like the header buttons */
+    border: 1px solid rgba(255, 255, 255, 0.15); /* Soft premium top-edge highlight */
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    margin-top: 10px;
+    box-shadow: 0 4px 12px rgba(42, 53, 64, 0.15);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+/* Smooth background hover overlay transition */
+.btn-submit::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--primary-hover-bg);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.btn-submit:hover::before {
+    opacity: 1;
+}
+
+.btn-submit:hover {
+    box-shadow: 0 6px 16px rgba(42, 53, 64, 0.25);
+    transform: translateY(-1px);
+}
+
+.btn-submit:active {
+    transform: translateY(1px);
+}
+
+.auth-footer {
+    margin-top: 24px;
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.auth-footer a {
+    color: #3a4754; /* Slate match color instead of vivid blue */
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.auth-footer a:hover {
+    color: #1e262f; /* Deepens seamlessly on hover */
+    text-decoration: underline;
+}
+
+
+/* Modern SaaS Toast Notifications Stack - Top Center & Full Solid Backgrounds */
+#toast-container {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%); /* Centers the container perfectly on the screen */
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 400px;
+    width: calc(100% - 40px); /* Responsive safety padding on mobile screens */
+}
+
+.toast-card {
+    padding: 14px 20px;
+    border-radius: 8px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    opacity: 0;
+    /* Slide down animation from top center */
+    transform: translateY(-30px) scale(0.95);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+}
+
+.toast-card.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.toast-content {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff; /* White text for great readability against solid colorful backdrops */
+    padding-right: 16px;
+    line-height: 1.4;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 22px;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.toast-close:hover {
+    color: #ffffff;
+    transform: scale(1.15);
+}
+
+/* Full Solid Contextual Background Styles */
+.toast-success { 
+    background-color: var(--success-color); /* Premium Solid Green */
+}
+
+.toast-error { 
+    background-color: var(--error-color); /* Premium Solid Red */
+}
+
+.toast-info { 
+    background-color: #3b82f6; /* Premium Solid Blue */
+}
+
+.toast-warning { 
+    background-color: #f59e0b; /* Premium Solid Amber/Orange */
+}
+
+/* Fallback default style just in case a message lacks a tag */
+.toast-card:not([class*="toast-"]) {
+    background-color: var(--text-main);
+}
+
+/* Styling for Back to Home Action Link */
+.auth-back-home {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--border-color); /* Elegant divider line */
+}
+
+.auth-back-home a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted) !important;
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+/* Arrow Vector Sizing */
+.auth-back-home svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.2s ease;
+}
+
+/* Smooth Interactive Hover - Arrow shifts gently to the left */
+.auth-back-home a:hover {
+    color: #2a3540 !important; /* Highlights to match your dark theme button */
+    text-decoration: none !important;
+}
+
+.auth-back-home a:hover svg {
+    transform: translateX(-3px);
+}
+
+
+/* Success Animation Banner Graphics */
+.auth-icon-success-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.auth-icon-success-circle {
+    width: 64px;
+    height: 64px;
+    background-color: #f0fdf4; /* Soft success tint background tint */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--success-color);
+}
+
+.auth-icon-success-circle svg {
+    width: 36px;
+    height: 36px;
+}
+
+/* Informative Status Guidelines Box */
+.auth-info-box {
+    background-color: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+    text-align: left;
+    line-height: 1.5;
+    margin-bottom: 24px;
+}

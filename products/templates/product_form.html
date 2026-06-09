@@ -1,0 +1,509 @@
+{% extends "vendor_base.html" %}
+
+{% block title %}Product Catalog Management | Marketly{% endblock %}
+
+{% block content %}
+<style>
+    /* --- Marketly Premium SaaS Design Variables --- */
+    :root {
+        --bg-main: #f8fafc;
+        --surface: #ffffff;
+        --border: #e2e8f0;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
+        --primary: #2563eb;
+        --primary-hover: #1d4ed8;
+        
+        /* Contextual Status Badge Fills */
+        --bg-active: #ecfdf5;
+        --text-active: #10b981;
+        --bg-draft: #f1f5f9;
+        --text-draft: #475569;
+        --bg-out: #fef2f2;
+        --text-out: #ef4444;
+    }
+
+    .marketly-management-wrapper {
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        color: var(--text-main);
+        background-color: var(--bg-main);
+        min-height: 100vh;
+        padding: 2rem;
+    }
+
+    /* --- Workspace Layout Structure --- */
+    .dashboard-header {
+        margin-bottom: 2.5rem;
+    }
+
+    .dashboard-header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin: 0;
+    }
+
+    .dashboard-header p {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        margin: 6px 0 0 0;
+    }
+
+    .workspace-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 32px;
+        align-items: start;
+    }
+
+    @media (min-width: 1200px) {
+        .workspace-grid {
+            grid-template-columns: 1.1fr 0.9fr;
+        }
+    }
+
+    /* --- Premium Container Panels --- */
+    .panel-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        padding: 28px;
+    }
+
+    .panel-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-top: 0;
+        margin-bottom: 24px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    /* --- Form Layout & Accessible Typography --- */
+    .saas-form .form-group {
+        margin-bottom: 20px;
+    }
+
+    .saas-form .form-row-2x {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .saas-form label {
+        display: block;
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--text-main);
+    }
+
+    /* Fallback styles matching Python widget injection */
+    .saas-form input[type="text"],
+    .saas-form input[type="number"],
+    .saas-form textarea,
+    .saas-form select {
+        width: 100%;
+        padding: 10px 14px;
+        font-size: 0.95rem;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background-color: var(--surface);
+        box-sizing: border-box;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .saas-form input:focus, .saas-form textarea:focus, .saas-form select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    /* --- Multi-Image JavaScript Live Preview Grid --- */
+    .image-uploader-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 8px;
+    }
+
+    .preview-slot {
+        aspect-ratio: 1 / 1;
+        border: 2px dashed var(--border);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        background-color: var(--bg-main);
+    }
+
+    .preview-slot img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 2;
+    }
+
+    .upload-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-align: center;
+        pointer-events: none;
+    }
+
+    .upload-placeholder svg {
+        width: 20px;
+        height: 20px;
+        margin-bottom: 4px;
+        stroke: var(--text-muted);
+    }
+
+    .hidden-file-input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 3;
+    }
+
+    /* --- Form Formats & Control Elements --- */
+    .btn-primary {
+        background-color: var(--primary);
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 0.95rem;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+        width: 100%;
+    }
+
+    .btn-primary:hover { background-color: var(--primary-hover); }
+
+    /* --- Live Catalog Inventory Grid (Right Column) --- */
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 20px;
+    }
+
+    .product-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .product-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .product-thumb-wrapper {
+        aspect-ratio: 4 / 3;
+        background-color: var(--bg-main);
+        position: relative;
+    }
+
+    .product-thumb { width: 100%; height: 100%; object-fit: cover; }
+
+    .product-info {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .product-name {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin: 0 0 4px 0;
+        color: var(--text-main);
+    }
+
+    .product-category {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .product-pricing-block {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    .product-price { font-size: 1.125rem; font-weight: 700; color: var(--text-main); }
+    .product-discount { font-size: 0.875rem; color: var(--text-muted); text-decoration: line-through; }
+
+    .product-meta-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: auto;
+        padding-top: 12px;
+        border-top: 1px solid var(--border);
+    }
+
+    .stock-count { font-size: 0.825rem; color: var(--text-muted); }
+
+    /* --- Status Pills --- */
+    .status-badge {
+        display: inline-flex;
+        padding: 4px 8px;
+        border-radius: 9999px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    .status-badge.active { background-color: var(--bg-active); color: var(--text-active); }
+    .status-badge.draft { background-color: var(--bg-draft); color: var(--text-draft); }
+    .status-badge.out_of_stock { background-color: var(--bg-out); color: var(--text-out); }
+
+    /* --- Form Safe Deletion Elements --- */
+    .card-actions {
+        display: flex;
+        gap: 16px;
+        padding: 12px 16px;
+        background-color: var(--bg-main);
+        border-top: 1px solid var(--border);
+    }
+
+    .action-link {
+        font-size: 0.815rem;
+        font-weight: 600;
+        text-decoration: none;
+        color: var(--text-muted);
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+    }
+
+    .action-link:hover { color: var(--primary); }
+    .action-link.destructive:hover { color: var(--text-out); }
+</style>
+
+<div class="marketly-management-wrapper">
+    
+    <header class="dashboard-header">
+        <h1>Storefront Inventory Manager</h1>
+        <p>Control product listings, configurations, promotional values, and media storage blocks.</p>
+    </header>
+
+    <div class="workspace-grid">
+        
+        <section class="panel-card">
+            <h2 class="panel-title">
+                {% if form.instance.pk %}Modify: {{ form.instance.name }}{% else %}Create Elite Listing{% endif %}
+            </h2>
+            
+            <form method="post" enctype="multipart/form-data" class="saas-form">
+                {% csrf_token %}
+                
+                {% if form.errors %}
+                    <div style="padding: 12px; background-color: var(--bg-out); border-radius: 8px; margin-bottom: 20px; font-size: 0.875rem; color: var(--text-out); font-weight: 500;">
+                        {% for field, errors in form.errors.items %}
+                            <div>{{ field|capfirst }}: {{ errors.0 }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="form-row-2x">
+                    <div class="form-group">
+                        <label for="{{ form.name.id_for_label }}">Product Name</label>
+                        {{ form.name }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.category.id_for_label }}">Category Split</label>
+                        {{ form.category }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.description.id_for_label }}">Marketing Description</label>
+                    {{ form.description }}
+                </div>
+
+                <div class="form-row-2x">
+                    <div class="form-group">
+                        <label for="{{ form.price.id_for_label }}">Retail Price (USD)</label>
+                        {{ form.price }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.discount_price.id_for_label }}">Discount Offer Price</label>
+                        {{ form.discount_price }}
+                    </div>
+                </div>
+
+                <div class="form-row-2x">
+                    <div class="form-group">
+                        <label for="{{ form.stock.id_for_label }}">Available Physical Stock</label>
+                        {{ form.stock }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.sku.id_for_label }}">Inventory SKU Tag</label>
+                        {{ form.sku }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.status.id_for_label }}">Storefront Status visibility</label>
+                    {{ form.status }}
+                </div>
+
+                <div class="form-group">
+                    <label>Product Presentation Deck (Live Sync Preview)</label>
+                    <div class="image-uploader-container">
+                        
+                        <div class="preview-slot">
+                            {% if form.instance.image %}
+                                <img src="{{ form.instance.image.url }}" alt="Slot 1" id="img-target-1">
+                            {% else %}
+                                <img src="" alt="Slot 1" id="img-target-1" style="display: none;">
+                            {% endif %}
+                            <div class="upload-placeholder" id="placeholder-1" {% if form.instance.image %}style="display:none;"{% endif %}>
+                                <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
+                                <span>Main Image</span>
+                            </div>
+                            {{ form.image }}
+                        </div>
+
+                        <div class="preview-slot">
+                            {% if form.instance.image_2 %}
+                                <img src="{{ form.instance.image_2.url }}" alt="Slot 2" id="img-target-2">
+                            {% else %}
+                                <img src="" alt="Slot 2" id="img-target-2" style="display: none;">
+                            {% endif %}
+                            <div class="upload-placeholder" id="placeholder-2" {% if form.instance.image_2 %}style="display:none;"{% endif %}>
+                                <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                                <span>Angle 2</span>
+                            </div>
+                            {{ form.image_2 }}
+                        </div>
+
+                        <div class="preview-slot">
+                            {% if form.instance.image_3 %}
+                                <img src="{{ form.instance.image_3.url }}" alt="Slot 3" id="img-target-3">
+                            {% else %}
+                                <img src="" alt="Slot 3" id="img-target-3" style="display: none;">
+                            {% endif %}
+                            <div class="upload-placeholder" id="placeholder-3" {% if form.instance.image_3 %}style="display:none;"{% endif %}>
+                                <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                                <span>Detail View</span>
+                            </div>
+                            {{ form.image_3 }}
+                        </div>
+
+                    </div>
+                </div>
+
+                <div style="margin-top: 32px;">
+                    <button type="submit" class="btn-primary">Commit Matrix Changes</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="panel-card">
+            <h2 class="panel-title">Active Marketly Listings</h2>
+            
+            <div class="product-grid">
+                {% for product in products %}
+                    <div class="product-card">
+                        <div class="product-thumb-wrapper">
+                            <img src="{% firstof product.image.url 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=600&q=80' %}" 
+                                 alt="{{ product.name }}" class="product-thumb">
+                        </div>
+                        
+                        <div class="product-info">
+                            <span class="product-category">{% firstof product.category.name product.category "General Stock" %}</span>
+                            <h3 class="product-name">{{ product.name }}</h3>
+                            
+                            <div class="product-pricing-block">
+                                <span class="product-price">${{ product.price }}</span>
+                                {% if product.discount_price %}
+                                    <span class="product-discount">${{ product.discount_price }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="product-meta-row">
+                                <span class="stock-count">Units: <strong>{{ product.stock }}</strong></span>
+                                <span class="status-badge {% if product.status == 'active' %}active{% elif product.status == 'draft' %}draft{% else %}out_of_stock{% endif %}">
+                                    {{ product.get_status_display|default:product.status }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="card-actions">
+                            <a href="?edit={{ product.pk }}" class="action-link">Edit Properties</a>
+                            
+                            <form action="{% url 'delete_product_url_name' product.pk %}" method="post" style="display: inline;" onsubmit="return confirm('Confirm permanent wipe of SKU [{{ product.sku|escapejs }}] from your dashboard layout?');">
+                                {% csrf_token %}
+                                <button type="submit" class="action-link destructive">Wipe Asset</button>
+                            </form>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 64px 0; color: var(--text-muted);">
+                        <p>No active catalog matrix fields linked with this merchant vendor profile.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<script>
+    /**
+     * Intercepts native browser paths and maps selected device data streams into 
+     * explicit layout boxes cleanly.
+     */
+    document.addEventListener("DOMContentLoaded", function() {
+        const structuralBinds = [
+            { inputId: 'id_image', targetId: 'img-target-1', placeholderId: 'placeholder-1' },
+            { inputId: 'id_image_2', targetId: 'img-target-2', placeholderId: 'placeholder-2' },
+            { inputId: 'id_image_3', targetId: 'img-target-3', placeholderId: 'placeholder-3' }
+        ];
+
+        structuralBinds.forEach(binding => {
+            const el = document.getElementById(binding.inputId);
+            if (el) {
+                el.addEventListener('change', function() {
+                    const file = this.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const img = document.getElementById(binding.targetId);
+                            const placeholder = document.getElementById(binding.placeholderId);
+                            img.src = e.target.result;
+                            img.style.display = 'block';
+                            if (placeholder) placeholder.style.display = 'none';
+                        }
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}
