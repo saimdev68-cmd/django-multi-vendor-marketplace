@@ -76,7 +76,6 @@ class OrderItemAdmin(admin.ModelAdmin):
 
     list_filter = (
         "vendor",
-        "created_at",
     )
 
     search_fields = (

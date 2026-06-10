@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Order Success Confirmation{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50 py-16 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+    <div class="max-w-xl w-full bg-white border border-slate-100 rounded-2xl p-8 text-center shadow-sm">
+        <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 ring-8 ring-emerald-50/50">
+            <i class="fa-solid fa-check text-2xl"></i>
+        </div>
+        
+        <h1 class="text-3xl font-bold text-slate-900 tracking-tight mb-2">Thank you for your order!</h1>
+        <p class="text-slate-500 text-sm mb-6">Your payment went through successfully. We have dispatched updates to your micro-vendors.</p>
+
+        {% if order %}
+        <div class="bg-slate-50 rounded-2xl p-5 text-left mb-8 space-y-3 border border-slate-100">
+            <div class="flex justify-between text-xs font-semibold tracking-wider text-slate-400 uppercase">
+                <span>Receipt Summary</span>
+                <span class="text-slate-900 font-bold">{{ order.order_number }}</span>
+            </div>
+            <hr class="border-slate-200/60">
+            <div class="flex justify-between text-sm">
+                <span class="text-slate-500">Fulfillment Status</span>
+                <span class="font-semibold text-slate-900 capitalize">{{ order.status }}</span>
+            </div>
+            <div class="flex justify-between text-sm">
+                <span class="text-slate-500">Amount Settled</span>
+                <span class="font-bold text-slate-900">${{ order.total_amount }}</span>
+            </div>
+            <div class="text-sm pt-1">
+                <span class="text-slate-500 block mb-1">Shipping Route Target:</span>
+                <p class="text-slate-800 text-xs font-medium bg-white border border-slate-200/60 rounded-xl p-3 whitespace-pre-line">{{ order.shipping_address }}</p>
+            </div>
+        </div>
+        {% else %}
+        <div class="bg-slate-50 rounded-2xl p-6 text-center text-slate-400 text-sm mb-8">
+            No active order data details detected.
+        </div>
+        {% endif %}
+
+        <a href="/" class="inline-block py-3 px-6 rounded-xl text-sm font-medium text-white bg-gradient-to-b from-slate-700 to-slate-900 hover:from-slate-800 hover:to-black transition-all shadow-sm">
+            Return to Marketplace
+        </a>
+    </div>
+</div>
+{% endblock %}

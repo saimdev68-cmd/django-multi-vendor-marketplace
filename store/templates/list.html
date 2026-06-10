@@ -2,11 +2,7 @@
 {% load static %}
 
 {% block title %}
-Search Results for "{{ request.GET.q }}"
-{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/search-explorer.css' %}">
+Featured Products
 {% endblock %}
 
 {% block content %}
@@ -18,7 +14,7 @@ Search Results for "{{ request.GET.q }}"
             {% if request.GET.q %}
                 Results for <span class="search-query-badge">"{{ request.GET.q }}"</span>
             {% else %}
-                All Products
+                Featured Products
             {% endif %}
         </h1>
         {% if products %}
@@ -74,11 +70,10 @@ Search Results for "{{ request.GET.q }}"
         </aside>
 
         <main class="results-area">
-            
             {% if products %}
                 <div class="products-grid">
                     {% for product in products %}
-                        <article class="product-card">
+                        <article class="product-card delete">
                             
                             <button type="button" class="wishlist-btn" aria-label="Add to wishlist">
                                 <i class="fa-regular fa-heart"></i>
@@ -96,25 +91,41 @@ Search Results for "{{ request.GET.q }}"
                                 </a>
 
                                 <div class="product-details">
-                                    <a href="#" class="product-name">
-                                        {{ product.name }}
-                                    </a>
-                                    <p class="product-price">${{ product.price }}</p>
+                                    <h2 class="product-name">
+                                        <a href="#">{{ product.name }}</a>
+                                    </h2>
                                     
-                                    <div class="product-rating">
-                                        <i class="fa-solid fa-star"></i>
-                                        <span class="rating-score">4.7</span>
-                                        <span class="rating-count">(48)</span>
+                                    <span class="product-sku">SKU-{{ product.sku|default:"1010" }}</span>
+                                    
+                                    <div class="price-container">
+                                        <span class="product-price">${{ product.price }}</span>
+                                        {% if product.old_price %}
+                                            <span class="product-old-price">${{ product.old_price }}</span>
+                                        {% else %}
+                                            <span class="product-old-price">$100.00</span>
+                                        {% endif %}
                                     </div>
+
+                                    <div class="product-vendor-row">
+                                        <a href="#" class="vendor-link">
+                                            <i class="fa-solid fa-store"></i> {{ product.vendor|default:"Store Name" }}
+                                        </a>
+                                    </div>
+                                    
+                                    <div class="product-footer-row">
+                                        <div class="product-inventory">
+                                            Available: <span class="inventory-count">{{ product.stock|default:"50" }}</span>
+                                        </div>
+                                        </div>
+
+                                    <form action="" method="post" class="add-to-cart-form">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-primary btn-full">
+                                            <i class="fa-solid fa-cart-shopping"></i> Add To Cart
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
-
-                            <form action="" method="post" class="add-to-cart-form">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-secondary btn-full">
-                                    Add to Cart
-                                </button>
-                            </form>
                         </article>
                     {% endfor %}
                 </div>
@@ -137,20 +148,16 @@ Search Results for "{{ request.GET.q }}"
                                     {% else %}
                                         <a href="?q={{ request.GET.q }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}&in_stock={{ request.GET.in_stock }}&on_sale={{ request.GET.on_sale }}&page={{ num }}" class="page-number">{{ num }}</a>
                                     {% endif %}
-
                                 {% elif num == 2 and page_obj.number > 4 %}
                                     <span class="page-ellipsis">...</span>
-
                                 {% elif num == paginator.num_pages %}
                                     {% if page_obj.number == num %}
                                         <span class="page-number active">{{ num }}</span>
                                     {% else %}
                                         <a href="?q={{ request.GET.q }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}&in_stock={{ request.GET.in_stock }}&on_sale={{ request.GET.on_sale }}&page={{ num }}" class="page-number">{{ num }}</a>
                                     {% endif %}
-
                                 {% elif num == paginator.num_pages|add:"-1" and page_obj.number < paginator.num_pages|add:"-3" %}
                                     <span class="page-ellipsis">...</span>
-
                                 {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
                                     {% if page_obj.number == num %}
                                         <span class="page-number active">{{ num }}</span>
@@ -170,7 +177,6 @@ Search Results for "{{ request.GET.q }}"
                         </div>
                     </nav>
                 {% endif %}
-
             {% else %}
                 <div class="empty-state">
                     <div class="empty-icon-wrapper">
@@ -183,10 +189,7 @@ Search Results for "{{ request.GET.q }}"
                     </a>
                 </div>
             {% endif %}
-
         </main>
     </div>
 </div>
-
-<script src="{% static 'js/search-explorer.js' %}"></script>
 {% endblock %}

@@ -1,5 +1,7 @@
 from django.db import models
 from buyer.models import Buyer
+from products.models import Product
+from vendor.models import Vendor
 
 
 class Order(models.Model):
@@ -48,13 +50,9 @@ class Order(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return self.order_number
+        return self.buyer.user.email
+
     
-from django.db import models
-from product.models import Product
-from vendor.models import Vendor
-
-
 class OrderItem(models.Model):
 
     order = models.ForeignKey(
@@ -75,7 +73,7 @@ class OrderItem(models.Model):
         ordering = ["-id"]
 
     def __str__(self):
-        return f"{self.product.name} x {self.quantity}"
+        return self.product.name
 
     def total_price(self):
         return self.price * self.quantity

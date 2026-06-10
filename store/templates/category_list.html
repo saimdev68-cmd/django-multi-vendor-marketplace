@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}All Categories{% endblock %}
+
+{% block content %}
+<div class="category-page-container">
+    
+    <div class="category-page-header">
+        <h1 class="category-page-title">Browse by Category</h1>
+        <p class="category-page-subtitle">Explore our marketplace catalog across curated collections and premium vendors.</p>
+    </div>
+
+    <div class="category-master-grid">
+        {% for category in categories %}
+            <a href="#" class="category-matrix-card">
+                
+                <div class="category-matrix-badge">
+                    {% if category.image %}
+                        <img src="{{ category.image.url }}" alt="{{ category.name }}" class="category-matrix-img">
+                    {% else %}
+                        <i class="fa-solid fa-layer-group fallback-icon"></i>
+                    {% endif %}
+                </div>
+
+                <div class="category-matrix-info">
+                    <span class="category-matrix-name">{{ category.name }}</span>
+                    <span class="category-matrix-count">{{ category.product_count|default:"Browse Products" }}</span>
+                </div>
+
+            </a>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

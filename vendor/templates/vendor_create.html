@@ -1,130 +1,22 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Become a Vendor | MultiVendor Shop</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static "css/vendor_create.css" %}">
+    <title>Vendor | Create</title>
 </head>
 <body>
-
-    <div class="signup-container">
-        <div class="header">
-            <h2>Start selling today</h2>
-            <p>Setup your store front and banking configurations</p>
-        </div>
-
-        <div class="steps-container">
-            <div class="step-progress" id="progressLine"></div>
-            <div class="step-circle active" data-step="1">1</div>
-            <div class="step-circle" data-step="2">2</div>
-        </div>
-
-        <form action="" method="post" enctype="multipart/form-data" id="multiStepForm">
-            {% csrf_token %}
-
-            <div class="form-step active" id="step-1">
-                <div class="step-title"><i class="fa-solid fa-shop"></i> Store Information</div>
-                
-                <div class="form-field">
-                    <label for="{{ vendor_form.store_name.id_for_label }}">Store Name</label>
-                    {{ vendor_form.store_name }}
-                </div>
-                
-                <div class="form-field">
-                    <label for="{{ vendor_form.description.id_for_label }}">Description</label>
-                    {{ vendor_form.description }}
-                </div>
-
-                <div class="form-group-grid">
-                    <div class="form-field">
-                        <label for="{{ vendor_form.logo.id_for_label }}">Store Logo</label>
-                        <div class="custom-file-upload">
-                            <i class="fa-solid fa-cloud-arrow-up"></i>
-                            <span class="file-label-text">Click to upload logo Front</span>
-                            {{ vendor_form.logo }}
-                        </div>
-                    </div>
-                    <div class="form-field">
-                        <label for="{{ vendor_form.banner.id_for_label }}">Store Banner</label>
-                        <div class="custom-file-upload">
-                            <i class="fa-solid fa-image"></i>
-                            <span class="file-label-text">Click to upload banner Background</span>
-                            {{ vendor_form.banner }}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group-grid">
-                    <div class="form-field">
-                        <label for="{{ vendor_form.phone_number.id_for_label }}">Phone Number</label>
-                        {{ vendor_form.phone_number }}
-                    </div>
-                    <div class="form-field">
-                        <label for="{{ vendor_form.city.id_for_label }}">City</label>
-                        {{ vendor_form.city }}
-                    </div>
-                </div>
-
-                <div class="form-field">
-                    <label for="{{ vendor_form.address.id_for_label }}">Business Address</label>
-                    {{ vendor_form.address }}
-                </div>
-            </div>
-
-            <div class="form-step" id="step-2">
-                <div class="step-title"><i class="fa-solid fa-credit-card"></i> Payout Configurations</div>
-
-                <div class="form-group-grid">
-                    <div class="form-field">
-                        <label for="{{ bank_account_form.bank_name.id_for_label }}">Bank Name</label>
-                        {{ bank_account_form.bank_name }}
-                    </div>
-                    <div class="form-field">
-                        <label for="{{ bank_account_form.account_holder_name.id_for_label }}">Account Holder Name</label>
-                        {{ bank_account_form.account_holder_name }}
-                    </div>
-                </div>
-
-                <div class="form-group-grid">
-                    <div class="form-field">
-                        <label for="{{ bank_account_form.account_number.id_for_label }}">Account Number</label>
-                        {{ bank_account_form.account_number }}
-                    </div>
-                    <div class="form-field">
-                        <label for="{{ bank_account_form.iban_number.id_for_label }}">IBAN Number</label>
-                        {{ bank_account_form.iban_number }}
-                    </div>
-                </div>
-
-                <div class="form-group-grid">
-                    <div class="form-field">
-                        <label for="{{ bank_account_form.swift_code.id_for_label }}">SWIFT Code</label>
-                        {{ bank_account_form.swift_code }}
-                    </div>
-                    <div class="form-field">
-                        <label for="{{ bank_account_form.account_type.id_for_label }}">Account Type</label>
-                        {{ bank_account_form.account_type }}
-                    </div>
-                </div>
-
-                <div class="form-field" style="flex-direction: row; align-items: center; gap: 10px;">
-                    {{ bank_account_form.is_primary }}
-                    <label for="{{ bank_account_form.is_primary.id_for_label }}" style="margin-bottom: 0;">Set as Primary Payout Account</label>
-                </div>
-            </div>
-
-            <div class="btn-container">
-                <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">Back</button>
-                <button type="button" class="btn btn-primary" id="nextBtn">Continue</button>
-                <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">Complete Setup</button>
-            </div>
-        </form>
-    </div>
-
-    <script src="{% static 'js/vendor_create.js' %}"></script>
+    <h2>Register Your Shop</h2>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{vendor_form.as_p}}
+        {{bank_account_form.as_p}}
+        <button type="submit">Register</button>
+    </form>
+    <a href="#">Back to home</a>
+    <form action="{% url "accounts:logout" %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
 </body>
 </html>

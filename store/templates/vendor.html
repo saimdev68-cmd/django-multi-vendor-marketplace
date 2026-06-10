@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %} Vendor | List {% endblock %}
+
+
+{% block content %}
+
+<div class="section-wrapper-shelf">
+    <div class="products-adaptive-grid"> {% for vendor in vendors %}
+            <div class="vendor-showcase-card group">
+                
+                <div class="vendor-banner-frame">
+                    {% if vendor.banner %}
+                        <img src="{{ vendor.banner.url }}" alt="{{ vendor.store_name }} banner" class="vendor-banner-img">
+                    {% endif %}
+                    <div class="vendor-banner-tint"></div>
+
+                    <div class="vendor-avatar-badge">
+                        {% if vendor.logo %}
+                            <img src="{{ vendor.logo.url }}" alt="{{ vendor.store_name }} logo" class="vendor-avatar-resource">
+                        {% else %}
+                            <div class="vendor-avatar-text-fallback">
+                                {{ vendor.store_name|slice:":2"|upper }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="vendor-metadata-stack">
+                    <a href="#" class="vendor-title-link">{{ vendor.store_name }}</a>
+                    
+                    <div class="vendor-stats-block">
+                        <div class="vendor-rating-row-inline">
+                            <i class="fa-solid fa-star"></i>
+                            <span class="vendor-rating-num">{{ vendor.rating|default:"4.9" }} Rating</span>
+                        </div>
+                        <div class="vendor-followers-row-block">
+                            {{ vendor.followers_count|default:"1.2k" }} followers
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vendor-action-wrapper">
+                    <a href="#" class="btn-vendor-visit">Visit Store</a>
+                </div>
+
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
