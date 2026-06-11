@@ -24,7 +24,6 @@ class Vendor(models.Model):
     city = models.CharField(max_length=100)
     address = models.TextField()
     status = models.CharField(max_length=20,choices=VendorStatus.choices,default=VendorStatus.PENDING)
-    is_verified = models.BooleanField(default=False)
     is_featured = models.BooleanField(default=False)
     commission_rate = models.DecimalField(max_digits=5,decimal_places=2,default=10.00)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -49,26 +48,3 @@ class Vendor(models.Model):
                 counter += 1
             self.slug = slug
         super().save(*args, **kwargs)
-
-class BankAccount(models.Model):
-
-    class AccountType(models.TextChoices):
-        SAVINGS = "savings", "Savings"
-        CURRENT = "current", "Current"
-
-    vendor = models.OneToOneField(Vendor,on_delete=models.CASCADE,related_name="bank_account")
-    account_holder_name = models.CharField(max_length=255)
-    bank_name = models.CharField(max_length=255)
-    account_number = models.CharField(max_length=50)
-    iban_number = models.CharField(max_length=50)
-    account_type = models.CharField(max_length=20,choices=AccountType.choices,default=AccountType.CURRENT)
-    is_verified = models.BooleanField(default=False)
-    is_primary = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-created_at"]
-
-    def __str__(self):
-        return f"{self.bank_name} - {self.account_holder_name}"

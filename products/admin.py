@@ -8,6 +8,7 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "id",
+        'slug',
         "is_active",
     )
 
@@ -19,7 +20,7 @@ class CategoryAdmin(admin.ModelAdmin):
         "name",
     )
     prepopulated_fields = {"slug": ("name",)}
-    ordering = ("name",)
+    ordering = ("id",)
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -45,7 +46,6 @@ class ProductAdmin(admin.ModelAdmin):
 
     search_fields = (
         "name",
-        "sku",
         "vendor__store_name",
         "category__name",
     )
@@ -72,8 +72,7 @@ class ProductAdmin(admin.ModelAdmin):
             "fields": (
                 "price",
                 "discount_price",
-                "stock",
-                "sku",
+                "stock"
             )
         }),
         ("Control", {

@@ -1,11 +1,13 @@
 {% extends "base_vendor.html" %}
 
-{% block title %}Product{% endblock  %}
+{% block title %} Vendor | Edit {% endblock  %}
 
 {% block content %}
+<h2>Edit Store detail</h2>
 <form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{form.as_p}}
-    <button type="submit">Save</button>
+    <button type="submit">Edit</button>
 </form>
+<a href="{% url "vendor:vendor_detail" %}">Cancel Update</a>
 {% endblock  %}

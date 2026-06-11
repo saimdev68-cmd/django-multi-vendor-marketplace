@@ -5,8 +5,8 @@ from vendor.models import Vendor
 
 class Category(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    slug = models.SlugField(max_length=255, unique=True, blank=True)
-    image = models.ImageField(upload_to="categories/", blank=True, null=True)
+    slug = models.SlugField(max_length=255, unique=True,)
+    image = models.ImageField(upload_to="categories/")
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -28,7 +28,7 @@ class Product(models.Model):
         DRAFT = "draft", "Draft"
         ACTIVE = "active", "Active"
         OUT_OF_STOCK = "out_of_stock", "Out of Stock"
-        ARCHIVED = "archived", "Archived"
+        REJECTED = "rejected", "Rejected"
 
     vendor = models.ForeignKey(
         Vendor,
@@ -48,12 +48,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     discount_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     stock = models.PositiveIntegerField(default=0)
-    sku = models.CharField(max_length=100, unique=True)
-    status = models.CharField(
-        max_length=20,
-        choices=ProductStatus.choices,
-        default=ProductStatus.DRAFT
-    )
+    status = models.CharField(max_length=20,choices=ProductStatus.choices,default=ProductStatus.DRAFT)
     is_featured = models.BooleanField(default=False)
     image = models.ImageField(upload_to="products/", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -65,21 +60,12 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             base_slug = slugify(self.name)
-            slug = base_slug
-
-            # Get all slugs starting with same base
-            existing_slugs = self.__class__.objects.filter(slug__startswith=base_slug)
-
-            # Extract numbers from similar slugs
-            slugs = existing_slugs.values_list("slug", flat=True)
-
             counter = 1
-            while slug in slugs:
+            slug = base_slug
+            while Product.objects.filter(slug=slug).exists():
                 slug = f"{base_slug}-{counter}"
                 counter += 1
-
             self.slug = slug
-
         super().save(*args, **kwargs)
 
     def __str__(self):

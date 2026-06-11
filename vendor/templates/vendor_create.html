@@ -1,22 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vendor | Create</title>
-</head>
-<body>
-    <h2>Register Your Shop</h2>
-    <form action="" method="post">
+{% extends "base_vendor.html" %}
+
+{% block title %} Vendor | Create {% endblock  %}
+
+{% block content %}
+<h2>Register Your Shop</h2>
+    <form action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{vendor_form.as_p}}
         {{bank_account_form.as_p}}
         <button type="submit">Register</button>
     </form>
-    <a href="#">Back to home</a>
-    <form action="{% url "accounts:logout" %}" method="post">
-        {% csrf_token %}
-        <button type="submit">Logout</button>
-    </form>
-</body>
-</html>
+{% endblock  %}

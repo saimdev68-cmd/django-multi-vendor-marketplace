@@ -42,15 +42,18 @@ class LoginView(FormView):
 
         if user is not None:
             login(self.request, user)
+
             if user.is_vendor:
-                if Vendor.objects.filter(owner=user).exists() and user.vendor.is_verified:
-                    return redirect ("vendor:dashboard")
-                elif Vendor.objects.filter(owner=user).exists() and not user.venodr.is_verified:
-                    return redirect ("vendor:vendor_detail")
-                elif not Vendor.objects.filter(owner=user).exists():
-                    return redirect ("vendor:vendor_create")
-            else:
-                return redirect ("store:home")
+                vendor = Vendor.objects.filter(owner=user).first()
+
+                if vendor and vendor.status in [Vendor.VendorStatus.ACTIVE, Vendor.VendorStatus.SUSPENDED]:
+                    return redirect("vendor:dashboard")
+                elif vendor:
+                    return redirect("vendor:vendor_detail")
+                else:
+                    return redirect("vendor:vendor_create")
+
+            return redirect("store:home")
 
         form.add_error(None, "Invalid email or password.")
         return self.form_invalid(form)

@@ -1,32 +1,21 @@
-{% extends "base.html" %}
+{% extends "base_vendor.html" %}
 
-{% block title %}{{ product.name }}{% endblock %}
+{% block title %}Product{% endblock  %}
 
 {% block content %}
-
-<div class="row">
-
-    <div class="col-md-6">
-        {% if product.image %}
-            <img src="{{ product.image.url }}" class="img-fluid">
-        {% endif %}
-    </div>
-
-    <div class="col-md-6">
-
-        <h2>{{ product.name }}</h2>
-
-        <p><strong>Price:</strong> ${{ product.final_price }}</p>
-        <p><strong>Vendor:</strong> {{ product.vendor.store_name }}</p>
-        <p><strong>Category:</strong> {{ product.category.name }}</p>
-        <p><strong>Stock:</strong> {{ product.stock }}</p>
-
-        <p>{{ product.description }}</p>
-
-        <button class="btn btn-success">Add to Cart</button>
-
-    </div>
-
-</div>
-
-{% endblock %}
+<p>{{product.name}}</p>
+<p>{{product.stock}}</p>
+<p>{{product.status}}</p>
+<p>{{product.price}}</p>
+<p>{{product.created_at}}</p>
+{% if product.image %}
+<img src="{{product.image.url}}" width="800" height="400" alt="">
+{% endif %}
+<a href="{% url "products:product_update" product.id %}">Edit</a>
+<form action="{% url "products:product_delete" product.id %}" method="post">
+    {% csrf_token %}
+    <button type="submit" onclick="return confirm ('Are You Sure ?')">
+        Delete
+    </button>
+</form>
+{% endblock  %}

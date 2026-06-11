@@ -1,151 +1,23 @@
-{% extends "vendor_base.html" %}
+{% extends "base_vendor.html" %}
 
-{% block title %}Store Profile | {{ vendor.store_name }}{% endblock %}
+{% block title %} Vendor | detail {% endblock  %}
 
 {% block content %}
-<div class="profile-view-wrapper">
-
-    <div class="brand-hero-card">
-        <div class="hero-banner-frame" onclick="openLightbox(this)">
-            {% if vendor.banner %}
-                <img src="{{ vendor.banner.url }}" alt="{{ vendor.store_name }} Banner" id="vendorBannerImg">
-            {% else %}
-                <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);"></div>
-            {% endif %}
-        </div>
-        
-        <div class="brand-identity-row">
-            <div class="identity-left-pod">
-                <div class="brand-logo-avatar" {% if vendor.logo %} onclick="openLightbox(this)" {% endif %}>
-                    {% if vendor.logo %}
-                        <img src="{{ vendor.logo.url }}" alt="{{ vendor.store_name }} Logo" id="vendorLogoImg">
-                    {% else %}
-                        <div class="brand-logo-placeholder">
-                            {{ vendor.store_name|slice:":1"|upper }}
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="identity-meta-text">
-                    <h2>
-                        {{ vendor.store_name }}
-                        {% if vendor.is_verified %}
-                            <i class="fa-solid fa-circle-check verified-badge" title="Verified Store Profile"></i>
-                        {% endif %}
-                    </h2>
-                    <span class="status-badge-pill status-{{ vendor.status }}">
-                        {{ vendor.get_status_display }}
-                    </span>
-                </div>
-            </div>
-            
-            <div class="action-button-group">
-                <a href="{% url "vendor:vendor_update" %}" class="btn-edit-profile">
-                    <i class="fa-solid fa-pen-to-square"></i> Edit Store Settings
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <div class="profile-split-grid">
-        
-        <div class="details-main-panel">
-            <div class="info-card">
-                <h3><i class="fa-solid fa-align-left"></i> About Vendor</h3>
-                {% if vendor.description %}
-                    <p>{{ vendor.description }}</p>
-                {% else %}
-                    <p style="color: var(--text-muted); font-style: italic;">No vendor store description has been registered yet.</p>
-                {% endif %}
-            </div>
-
-            <div class="info-card">
-                <h3><i class="fa-solid fa-address-book"></i> Contact Information</h3>
-                <div class="meta-list-rows">
-                    <div class="meta-row">
-                        <span class="meta-label">Primary Owner Account Email</span>
-                        <span class="meta-value">{{ vendor.owner.email }}</span>
-                    </div>
-                    <div class="meta-row">
-                        <span class="meta-label">Phone Hotline</span>
-                        <span class="meta-value">{% firstof vendor.phone_number "—" %}</span>
-                    </div>
-                    <div class="meta-row">
-                        <span class="meta-label">Headquarters Address</span>
-                        <span class="meta-value">{% firstof vendor.address "—" %}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="details-sidebar-panel">
-            <div class="info-card">
-                <h3><i class="fa-solid fa-shield-halved"></i> Logistics & Permissions</h3>
-                <div class="meta-list-rows">
-                    <div class="meta-row">
-                        <span class="meta-label">Operating City</span>
-                        <span class="meta-value">{% firstof vendor.city "—" %}</span>
-                    </div>
-                    <div class="meta-row">
-                        <span class="meta-label">Platform Margin Rate</span>
-                        <span class="meta-value">{{ vendor.commission_rate }}%</span>
-                    </div>
-                    <div class="meta-row">
-                        <span class="meta-label">Featured Merchant</span>
-                        <span class="meta-value">
-                            {% if vendor.is_featured %}
-                                <span style="color: #10b981; font-weight: 600;">Yes</span>
-                            {% else %}
-                                <span style="color: var(--text-muted);">No</span>
-                            {% endif %}
-                        </span>
-                    </div>
-                    <div class="meta-row">
-                        <span class="meta-label">Onboarded Since</span>
-                        <span class="meta-value" style="font-size: 13px;">{{ vendor.created_at|date:"M d, Y" }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-</div>
-
-<div class="lightbox-modal" id="globalLightbox" onclick="closeLightbox()">
-    <div class="lightbox-content" onclick="event.stopPropagation()"> <button class="lightbox-close" onclick="closeLightbox()">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
-        <img src="" alt="Enlarged Store Asset" class="lightbox-image" id="lightboxTargetSrc">
-    </div>
-</div>
-
-<script>
-    const lightbox = document.getElementById('globalLightbox');
-    const lightboxImg = document.getElementById('lightboxTargetSrc');
-
-    function openLightbox(element) {
-        // Find the image inside the clicked element frame container
-        const targetImg = element.querySelector('img');
-        if (targetImg && targetImg.src) {
-            lightboxImg.src = targetImg.src;
-            lightbox.classList.add('is-active');
-            document.body.style.overflow = 'hidden'; // Freeze background scrolling
-        }
-    }
-
-    function closeLightbox() {
-        lightbox.classList.remove('is-active');
-        document.body.style.overflow = ''; // Unfreeze scrolling
-        setTimeout(() => {
-            lightboxImg.src = ''; // Clean source string after transition ends
-        }, 300);
-    }
-
-    // Close lightbox automatically if user hits ESC key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && lightbox.classList.contains('is-active')) {
-            closeLightbox();
-        }
-    });
-</script>
-{% endblock %}
+<p>Email : {{vendor.owner.email}}</p>
+<p>Store Name : {{vendor.store_name}}</p>
+<p>Description : {{vendor.description}}</p>
+{% if vendor.logo %}
+<img src="{{vendor.logo.url}}" width="200" height="150" alt=""><br>
+{% endif %}
+{% if vendor.banner %}
+<img src="{{vendor.banner.url}}" width="1000" height="500" alt="">
+{% endif %}
+<p>Phone Number : {{vendor.phone_number}}</p>
+<p>Country : {{vendor.country}}</p>
+<p>City : {{vendor.city}}</p>
+<p>Address : {{vendor.address}}</p>
+<p>Status : {{vendor.status}}</p>
+<p>Commission Rate : {{vendor.commission_rate}}</p>
+<p>Created at : {{vendor.created_at}}</p>
+<a href="{% url "vendor:vendor_update" %}">Edit</a>
+{% endblock  %}

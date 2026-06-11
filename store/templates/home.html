@@ -1,148 +1,17 @@
 {% extends "base.html" %}
-{% load static %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Home{% endblock  %}
+
 
 {% block content %}
-<div class="slider-section-container">
-    <div class="slider-viewport-frame">
-        <div id="slider-track" class="slider-flex-track">
-            <div class="slide-item">
-                <img src="{% static 'images/Slider6.png' %}" alt="Marketplace Banner 1" class="slide-img">
-            </div>
-            <div class="slide-item">
-                <img src="{% static 'images/Slider5.png' %}" alt="Marketplace Banner 2" class="slide-img">
-            </div>
-            <div class="slide-item">
-                <img src="{% static 'images/Slider3.png' %}" alt="Marketplace Banner 3" class="slide-img">
-            </div>
-            <div class="slide-item">
-                <img src="{% static 'images/Slider1.png' %}" alt="Marketplace Banner 1 Clone" class="slide-img">
-            </div>
-        </div>
-
-        <div class="slider-controls-overlay">
-            <button onclick="goToSlide(0)" class="slider-dot active" aria-label="Slide 1"></button>
-            <button onclick="goToSlide(1)" class="slider-dot" aria-label="Slide 2"></button>
-            <button onclick="goToSlide(2)" class="slider-dot" aria-label="Slide 3"></button>
-        </div>
-
-        <div class="slider-gradient-overlay"></div>
-    </div>
-</div>
-
-<div class="section-wrapper-shelf">
-    <div class="section-header-row">
-        <h2 class="section-title">Categories</h2>
-        <a href="{% url "store:category" %}" class="section-link-action">See All</a>
-    </div>
-
-    <div class="categories-responsive-scroller">
-        {% for category in categories %}
-            <a href="{% url "store:category" %}" class="category-card-node group">
-                <div class="category-image-box">
-                    <img src="{{ category.image.url }}" alt="{{ category.name }}" class="category-resource-img">
-                </div>
-                <span class="category-title-text">{{ category.name }}</span>
-            </a>
-        {% endfor %}
-    </div>
-</div>
-
-<div class="section-wrapper-shelf">
-    <div class="section-header-row">
-        <h2 class="section-title">Featured Products</h2>
-        <a href="{% url "store:product" %}" class="section-link-action">See All</a>
-    </div>
-
-    <div class="products-adaptive-grid">
-        {% for product in products %}
-            <div class="product-item-card group">
-                
-                <button type="button" class="wishlist-toggle-bubble {% if product in user.wishlist.all %}is-liked{% endif %}" data-product-id="{{ product.id }}">
-                    <i class="{% if product in user.wishlist.all %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
-                </button>
-
-                <div class="card-interior-upper">
-                    <a href="#" class="product-image-anchor">
-                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-resource-img">
-                    </a>
-
-                    <div class="product-details-stack">
-                        <a href="#" class="product-title-link">{{ product.name }}</a>
-                        
-                        <div class="product-rating-row">
-                            <i class="fa-solid fa-star"></i>
-                            <span class="rating-numeric-value">4.6</span>
-                            <span class="rating-count-label">(231 reviews)</span>
-                        </div>
-
-                        <div class="vendor-attribution-block">
-                            <span class="vendor-brand-title">{{ product.vendor.shop_name|default:"Store Name" }}</span>
-                        </div>
-
-                        <p class="product-price-label">${{ product.price }}</p>
-                    </div>
-                </div>
-
-                <form action="{% url 'cart:add_to_cart' product.id %}" method="POST" class="cart-form-action">
-                    {% csrf_token %}
-                    <button type="submit" class="btn-action-add-cart">
-                        <i class="fa-solid fa-cart-shopping"></i> Add to Cart
-                    </button>
-                </form>
-
-            </div>
-        {% endfor %}
-    </div>
-</div>
-
-<div class="section-wrapper-shelf">
-    <div class="section-header-row">
-        <h2 class="section-title">Explore Top Vendor Stores</h2>
-        <a href="{% url "store:vendor_list" %}" class="section-link-action">See All</a>
-    </div>
-
-    <div class="products-adaptive-grid"> {% for vendor in vendors %}
-            <div class="vendor-showcase-card group">
-                
-                <div class="vendor-banner-frame">
-                    {% if vendor.banner %}
-                        <img src="{{ vendor.banner.url }}" alt="{{ vendor.store_name }} banner" class="vendor-banner-img">
-                    {% endif %}
-                    <div class="vendor-banner-tint"></div>
-
-                    <div class="vendor-avatar-badge">
-                        {% if vendor.logo %}
-                            <img src="{{ vendor.logo.url }}" alt="{{ vendor.store_name }} logo" class="vendor-avatar-resource">
-                        {% else %}
-                            <div class="vendor-avatar-text-fallback">
-                                {{ vendor.store_name|slice:":2"|upper }}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="vendor-metadata-stack">
-                    <a href="#" class="vendor-title-link">{{ vendor.store_name }}</a>
-                    
-                    <div class="vendor-stats-block">
-                        <div class="vendor-rating-row-inline">
-                            <i class="fa-solid fa-star"></i>
-                            <span class="vendor-rating-num">{{ vendor.rating|default:"4.9" }} Rating</span>
-                        </div>
-                        <div class="vendor-followers-row-block">
-                            {{ vendor.followers_count|default:"1.2k" }} followers
-                        </div>
-                    </div>
-                </div>
-
-                <div class="vendor-action-wrapper">
-                    <a href="#" class="btn-vendor-visit">Visit Store</a>
-                </div>
-
-            </div>
-        {% endfor %}
-    </div>
-</div>
+<h1>Categories</h1>
+<a href="{% url "store:category_list" %}">View All</a>
+{% for category in categories %}
+<p>{{category.name}}</p>
+<img src="{{category.image.url}}" width="150" height="80" alt=""><br>
+{% endfor %}
+{% for product in products %}
+<img src="{{product.image.url}}" width="600" height="200" alt="">
+<a href="{% url "products:product_detail" product.id %}"><p>{{product.name}}</p></a>
+{% endfor %}
 {% endblock %}
