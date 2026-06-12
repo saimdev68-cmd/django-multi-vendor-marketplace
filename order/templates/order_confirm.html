@@ -3,7 +3,7 @@
 {% block title %}Order | Confirm{% endblock  %}
 
 {% block content %}
-{% for item in order.items.all %}
+{% for item in items %}
 <p>{{item.product.name}}</p>
 <img src="{{item.product.image.url}}" width="200" height="100" alt="">
 <p>{{item.product.price}}</p>

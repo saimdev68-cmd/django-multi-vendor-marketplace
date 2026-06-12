@@ -1,165 +1,24 @@
 {% extends "base.html" %}
 
-{% block title %}Your Cart | Marketplace{% endblock %}
+{% block title %} Cart {% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-7xl mx-auto">
-        
-        <!-- Page Header -->
-        <div class="mb-8">
-            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Shopping Cart</h1>
-            <p class="text-sm text-slate-500 mt-1">Review your items before proceeding to secure checkout.</p>
-        </div>
-
-        {% if cart.items.all %}
-        <!-- Two Column Layout -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
-            <!-- Left Column: Cart Items List (8 Cols) -->
-            <div class="lg:col-span-8 space-y-4">
-                <div class="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
-                    
-                    <!-- Table Header (Hidden on Mobile) -->
-                    <div class="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                        <div class="col-span-6">Product Details</div>
-                        <div class="col-span-2 text-center">Price</div>
-                        <div class="col-span-2 text-center">Quantity</div>
-                        <div class="col-span-2 text-right">Total</div>
-                    </div>
-
-                    <!-- Items Rows -->
-                    <div class="divide-y divide-slate-100">
-                        {% for item in cart.items.all %}
-                        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center p-6 transition-colors hover:bg-slate-50/40">
-                            
-                            <!-- Product Name & Context -->
-                            <div class="col-span-1 md:col-span-6 flex items-center gap-4">
-                                <div class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center border border-slate-200/60 overflow-hidden shrink-0">
-                                    {% if item.product.primary_image %}
-                                        <img src="{{ item.product.primary_image.url }}" alt="{{ item.product.name }}" class="w-full h-full object-cover">
-                                    {% else %}
-                                        <i class="fa-solid fa-box text-xl text-slate-400"></i>
-                                    {% endif %}
-                                </div>
-                                <div class="space-y-1">
-                                    <h3 class="text-sm font-semibold text-slate-900 line-clamp-2">
-                                        {{ item.product.name }}
-                                    </h3>
-                                    <p class="text-[11px] text-slate-400 flex items-center gap-1">
-                                        <i class="fa-solid fa-store"></i>
-                                        {{ item.product.vendor.shop_name|default:"Verified Seller" }}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <!-- Unit Price -->
-                            <div class="col-span-1 md:col-span-2 flex md:justify-center items-center justify-between mt-2 md:mt-0">
-                                <span class="md:hidden text-xs font-medium text-slate-400">Unit Price:</span>
-                                <span class="text-sm font-medium text-slate-800">${{ item.product.final_price }}</span>
-                            </div>
-
-                            <!-- Qty Control Pill -->
-                            <div class="col-span-1 md:col-span-2 flex md:justify-center items-center justify-between mt-2 md:mt-0">
-                                <span class="md:hidden text-xs font-medium text-slate-400">Quantity:</span>
-                                <div class="inline-flex items-center bg-slate-50 border border-slate-200 rounded-xl p-1 shadow-inner">
-                                    <a href="{% url 'cart:update_cart' item.id %}?action=decrease" 
-                                       class="w-7 h-7 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-white rounded-lg transition-all text-xs font-bold">
-                                        <i class="fa-solid fa-minus"></i>
-                                    </a>
-                                    <span class="w-8 text-center text-xs font-semibold text-slate-800 selection:bg-transparent">
-                                        {{ item.quantity }}
-                                    </span>
-                                    <a href="{% url 'cart:update_cart' item.id %}?action=increase" 
-                                       class="w-7 h-7 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-white rounded-lg transition-all text-xs font-bold">
-                                        <i class="fa-solid fa-plus"></i>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Item Total & Remove CTA -->
-                            <div class="col-span-1 md:col-span-2 flex md:flex-col items-center md:items-end justify-between md:justify-center gap-2 mt-2 md:mt-0">
-                                <span class="md:hidden text-xs font-medium text-slate-400">Total Price:</span>
-                                <div class="text-right">
-                                    <span class="text-sm font-bold text-slate-900 block">${{ item.total_price }}</span>
-                                    <a href="{% url 'cart:remove_from_cart' item.id %}" 
-                                       class="hidden md:inline-flex text-[11px] font-medium text-rose-500 hover:text-rose-700 transition-colors mt-1 items-center gap-1">
-                                        <i class="fa-regular fa-trash-can"></i> Remove
-                                    </a>
-                                    <a href="{% url 'cart:remove_from_cart' item.id %}" 
-                                       class="md:hidden inline-flex px-3 py-1.5 bg-rose-50 border border-rose-100 text-rose-600 rounded-lg text-xs font-semibold">
-                                        Remove
-                                    </a>
-                                </div>
-                            </div>
-
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <!-- Secondary Back to Shopping Button -->
-                <a href="#" class="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors py-2">
-                    <i class="fa-solid fa-arrow-left text-xs"></i>
-                    Continue Shopping
-                </a>
-            </div>
-
-            <!-- Right Column: Sticky Order Summary Panel (4 Cols) -->
-            <div class="lg:col-span-4 lg:sticky lg:top-8">
-                <div class="bg-white border border-slate-100 rounded-2xl shadow-sm p-6 space-y-6">
-                    <h3 class="text-lg font-semibold text-slate-900">Order Summary</h3>
-                    
-                    <!-- Line item breakdowns -->
-                    <div class="space-y-3 text-sm border-b border-slate-100 pb-4">
-                        <div class="flex justify-between text-slate-500">
-                            <span>Subtotal</span>
-                            <span class="font-medium text-slate-800">${{ cart.total_price }}</span>
-                        </div>
-                        <div class="flex justify-between text-slate-500">
-                            <span>Shipping</span>
-                            <span class="text-emerald-600 font-medium text-xs bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">Calculated next step</span>
-                        </div>
-                    </div>
-
-                    <!-- Main Order Total Box -->
-                    <div class="flex justify-between items-baseline">
-                        <span class="text-sm font-semibold text-slate-900">Estimated Total:</span>
-                        <span class="text-2xl font-black text-slate-900 tracking-tight">${{ cart.total_price }}</span>
-                    </div>
-
-                    <!-- High Contrast Action Checkout Trigger -->
-                    <a href="#" class="w-full py-3.5 px-4 text-center text-sm font-semibold text-white rounded-xl shadow-md bg-gradient-to-b from-slate-700 to-slate-900 hover:from-slate-800 hover:to-black transition-all duration-150 flex items-center justify-center gap-2 tracking-wide">
-                        <i class="fa-solid fa-lock text-xs opacity-80"></i>
-                        Proceed to Checkout
-                    </a>
-
-                    <!-- Trusted Badging Information -->
-                    <div class="pt-2 flex items-center justify-center gap-4 text-slate-400 text-xs">
-                        <span class="flex items-center gap-1"><i class="fa-solid fa-shield-halved text-slate-300"></i> SSL Secure</span>
-                        <span class="flex items-center gap-1"><i class="fa-solid fa-truck text-slate-300"></i> Fast Delivery</span>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        {% else %}
-        <!-- Empty State UI -->
-        <div class="bg-white border border-slate-100 rounded-2xl shadow-sm p-12 text-center max-w-xl mx-auto mt-12">
-            <div class="w-16 h-16 bg-slate-50 border border-slate-100 text-slate-400 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
-                <i class="fa-solid fa-basket-shopping text-2xl"></i>
-            </div>
-            <h3 class="text-lg font-semibold text-slate-900">Your cart is empty</h3>
-            <p class="text-sm text-slate-400 mt-1 max-w-sm mx-auto">Looks like you haven't added anything to your cart yet. Head back to our shop to find premium products.</p>
-            <div class="mt-6">
-                <a href="#" class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white rounded-xl shadow-md bg-gradient-to-b from-slate-700 to-slate-900 hover:from-slate-800 hover:to-black transition-all duration-150">
-                    Explore Products
-                </a>
-            </div>
-        </div>
-        {% endif %}
-
-    </div>
-</div>
-{% endblock %}
+{% for item in cart.items.all %}
+<p>{{item.product.name}}</p>
+<img src="{{item.product.image.url}}" height="100" width="100" alt="">
+<p>{{item.product.price}}</p>
+<p>{{item.quantity}}</p>
+<form action="{% url "cart:increase_quantity" item.id %}" method="post">
+    {% csrf_token %}
+    <button type="submit">+</button>
+</form>
+<form action="{% url "cart:decrease_quantity" item.id %}" method="post">
+    {% csrf_token %}
+    <button type="submit">-</button>
+</form>
+<form action="{% url "cart:remove_from_cart" item.id %}" method="post">
+    {% csrf_token %}
+    <button type="submit">del</button>
+</form>
+{% endfor %}
+{% endblock  %}

@@ -1,101 +1,83 @@
-import uuid
 from django.urls import reverse_lazy
-from django.shortcuts import redirect
+from django.views import View
+from django.views.generic import TemplateView , FormView , ListView , DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import DetailView, FormView
-from .models import OrderItem, Order 
 from cart.models import Cart
-from .forms import DeliveryForm, PaymentForm
+from .forms import DeliveryForm
+from .models import Order , OrderItem
+from django.shortcuts import redirect
 
-class ConfirmView(LoginRequiredMixin, DetailView):
-    template_name = "confirm.html"
-    context_object_name = "cart"
-
-    def get_object(self, queryset=None):
-        return Cart.objects.get(buyer=self.request.user.buyer)
-
+class OrderConfirmView(LoginRequiredMixin,TemplateView):
+    template_name = "order_confirm.html"
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['active_step'] = 1
+        cart = Cart.objects.get(buyer=self.request.user.buyer)
+        items = cart.items.all()
+        context["items"] = items
         return context
-
-class DeliveryView(LoginRequiredMixin, FormView):
-    template_name = "delivery.html"
+    
+class OrderDeliveryView(LoginRequiredMixin,FormView):
+    template_name = "order_delivery.html"
     form_class = DeliveryForm
-    success_url = reverse_lazy("order:payment")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['active_step'] = 2
-        return context
+    success_url = reverse_lazy("order:order_checkout")
 
     def form_valid(self, form):
-        # Fixed typo from cleaned_date to cleaned_data
         name = form.cleaned_data.get("name")
+        phone = form.cleaned_data.get("phone")
         address = form.cleaned_data.get("address")
-        phone_number = form.cleaned_data.get("phone_number")
-        
         self.request.session["name"] = name
+        self.request.session["phone"] = phone
         self.request.session["address"] = address
-        self.request.session["phone_number"] = phone_number
         return super().form_valid(form)
     
-class PaymentView(LoginRequiredMixin, FormView):
-    template_name = "payment.html"
-    form_class = PaymentForm
-    success_url = reverse_lazy("order:last_order")
-
+class OrderCheckoutView(LoginRequiredMixin,View):
+    def post(self,request):
+        name = request.session.get("name")
+        phone = request.session.get("phone")
+        address = request.session.get("address")
+        cart = Cart.objects.get(buyer=request.user.buyer)
+        items = cart.items.all()
+        order = Order.objects.create(buyer=request.user.buyer,name=name,phone_number=phone,shipping_address=address)
+        total = 0
+        for item in items:
+            order_item = OrderItem.objects.create(
+                product = item.product,
+                order = order,
+                vendor = item.product.vendor,
+                price = item.product.price,
+                quantity = item.quantity
+            )
+            total += order_item.total_price
+        order.total_amount = total
+        order.save()
+        return redirect ("order:last_order")
+    
+class LastOrderView(LoginRequiredMixin,TemplateView):
+    template_name = "last_order.html"
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['active_step'] = 3
+        context["order"] = Order.objects.filter(buyer=self.request.user.buyer).last()
         return context
+    
+class OrderListView(LoginRequiredMixin,ListView):
+    template_name = "order_list.html"
+    context_object_name = "orders"
 
-    def form_valid(self, form):
-        buyer = self.request.user.buyer
-        try:
-            cart = Cart.objects.get(buyer=buyer)
-        except Cart.DoesNotExist:
-            return redirect("cart:view_cart") # Redirect back if cart became empty
+    def get_queryset(self):
+        return Order.objects.filter(buyer=self.request.user.buyer)
+    
+class VendorOrderListView(LoginRequiredMixin,ListView):
+    template_name = "vendor_order_list.html"
+    context_object_name = "orders"
 
-        # Grab cached values from session store
-        session_address = self.request.session.get("address", "No address provided")
-        session_name = self.request.session.get("name", "")
-        session_phone = self.request.session.get("phone_number", "")
-        full_shipping_payload = f"{session_name}\n{session_address}\nTel: {session_phone}"
+    def get_queryset(self):
+        return OrderItem.objects.filter(vendor=self.request.user.vendor)     
 
-        # 1. Create Order instance
-        order = Order.objects.create(
-            buyer=buyer,
-            order_number=f"ORD-{uuid.uuid4().hex[:12].upper()}",
-            status=Order.OrderStatus.CONFIRMED,
-            payment_status=Order.PaymentStatus.PAID,
-            total_amount=cart.total_price(), # Assuming total_price is a method or property
-            shipping_address=full_shipping_payload
-        )
-
-        # 2. Extract Cart items into persistent OrderItems
-        for item in cart.items.all():
-            OrderItem.objects.create(
-                order=order,
-                product=item.product,
-                vendor=item.product.vendor, # Mapping relational vendor data 
-                price=item.product.price,
-                quantity=item.quantity
-            )
-
-        # 3. Clear temporary cart state
-        cart.items.all().delete() 
-        
-        # Flush sensitive session addresses securely
-        self.request.session.pop("name", None)
-        self.request.session.pop("address", None)
-        self.request.session.pop("phone_number", None)
-
-        return super().form_valid(form)
-
-class LastOrderView(LoginRequiredMixin, DetailView):
-    template_name = "last_order.html"
+class VendorOrderDetailView(LoginRequiredMixin,DetailView):
+    template_name = "vendor_order_detail.html"
     context_object_name = "order"
 
-    def get_object(self, queryset=None):
-        return Order.objects.filter(buyer=self.request.user.buyer).order_by('-created_at').first()
+    def get_queryset(self):
+        return OrderItem.objects.filter(vendor=self.request.user.vendor)   

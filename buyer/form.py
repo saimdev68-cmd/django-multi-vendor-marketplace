@@ -8,22 +8,5 @@ class BuyerForm(forms.ModelForm):
         model = Buyer
         fields = [
             "phone_number",
-            "profile_image",
-            "date_of_birth",
-            "gender",
-            "address",
+            "profile_image"
         ]
-
-        widgets = {
-            "phone_number": forms.TextInput(attrs={"class": "form-control"}),
-            "profile_image": forms.ClearableFileInput(attrs={"class": "form-control"}),
-            "date_of_birth": forms.DateInput(attrs={
-                "class": "form-control",
-                "type": "date"
-            }),
-            "gender": forms.Select(attrs={"class": "form-control"}),
-            "address": forms.Textarea(attrs={
-                "class": "form-control",
-                "rows": 3
-            }),
-        }

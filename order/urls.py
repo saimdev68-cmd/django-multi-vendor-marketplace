@@ -4,8 +4,10 @@ from . import views
 app_name = "order"
 
 urlpatterns = [
-    path("confirm/",views.ConfirmView.as_view(),name="confirm"),
-    path("delivery/",views.DeliveryView.as_view(),name="delivery"),
-    path("payment/",views.PaymentView.as_view(),name="payment"),
-    path("last_order/",views.LastOrderView.as_view(),name="last_order")
+    path("",views.OrderListView.as_view(),name="order_list"),
+    path("vendor/",views.OrderListView.as_view(),name="vendor_order_list"),
+    path("confirm/",views.OrderConfirmView.as_view(),name="order_confirm"),
+    path("delivery/",views.OrderDeliveryView.as_view(),name="order_delivery"),
+    path("checkout/",views.OrderCheckoutView.as_view(),name="order_checkout"),
+    path("vendor/<int:pk>/",views.VendorOrderDetailView.as_view(),name="vendor_order_detail")
 ]

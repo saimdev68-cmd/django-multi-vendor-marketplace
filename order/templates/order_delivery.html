@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %} Buyer | Update {% endblock  %}
+{% block title %}Order | Confirm{% endblock  %}
 
 {% block content %}
-<h2>Update The Profile</h2>
+<h2>Delivery Detail</h2>
 <form action="" method="post">
     {% csrf_token %}
     {{form.as_p}}
-    <button type="submit">Edit</button>
+    <button type="submit">Next</button>
 </form>
 {% endblock  %}

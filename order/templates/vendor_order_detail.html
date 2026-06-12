@@ -3,10 +3,8 @@
 {% block title %}Order | Confirm{% endblock  %}
 
 {% block content %}
-{% for order in orders %}
 <p>{{order.product.name}}</p>
 <img src="{{order.product.image.url}}" width="200" height="100" alt="">
 <p>{{order.product.price}}</p>
 <p>Quantity : {{order.quantity}}</p>
-{% endfor %}
 {% endblock  %}
