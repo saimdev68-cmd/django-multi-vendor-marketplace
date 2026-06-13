@@ -1,27 +1,104 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% endblock  %}</title>
+    <title>{% block title %}Vendor Dashboard{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static "css/vendor_base.css" %}">
 </head>
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="{% url "vendor:vendor_dashboard" %}">Dashboard</a></li>
-                <li><a href="{% url "vendor:vendor_detail" %}">Store</a></li>
-                <li><a href="{% url "bank_account:bank_account_list" %}">Bank Details</a></li>
-                <li><a href="{% url "products:product_list" %}">View Products</a></li>
-                <li><a href="{% url "products:product_create" %}">Add A Product</a></li>
-                <li><form action="{% url "accounts:logout" %}" method="post">
+
+    <!-- Global Toast Notifications Target Container -->
+    <div id="toast-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="hidden-django-message" data-tags="{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="dashboard-layout" id="dashboard-wrapper">
+        
+        <!-- SIDEBAR NAVIGATION PANEL (ASIDE) -->
+        <aside class="sidebar" id="sidebar-nav">
+            <div class="sidebar-brand">
+                <div class="brand-logo">M<span>.</span></div>
+                <div class="brand-name">Marketly</div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <a href="{% url 'vendor:detail' %}" class="menu-item {% if request.resolver_match.view_name == 'vendor:detail' %}active{% endif %}">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span class="menu-text">Vendor Profile</span>
+                </a>
+
+                <a href="{% url 'bank:detail' %}" class="menu-item {% if request.resolver_match.view_name == 'bank:detail' %}active{% endif %}">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                    <span class="menu-text">Bank Details</span>
+                </a>
+
+                {% if user.vendor.status == 'active' or user.vendor.status == 'suspended' %}
+                <a href="#" class="menu-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+                    <span class="menu-text">Analytics Dashboard</span>
+                </a>
+                {% endif %}
+            </nav>
+
+            <!-- Sidebar Actions Footer / Collapsible Toggle Anchor -->
+            <div class="sidebar-footer">
+                <form action="{% url 'accounts:logout' %}" method="post" class="logout-action-form">
                     {% csrf_token %}
-                    <button type="submit">Logout</button>
-                </form></li>
-            </ul>
-        </nav>
-    </header>
-    {% block content %}
-    {% endblock  %}
+                    <button type="submit" class="btn-sidebar-logout">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                        <span class="menu-text">Logout</span>
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- MAIN LAYOUT WRAPPER PANELS -->
+        <div class="main-content-area">
+            <header class="top-context-bar">
+                <button class="toggle-collapse-btn" id="sidebar-toggle" aria-label="Toggle Navigation State">
+                    <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                
+                <div class="welcome-text">
+                    Welcome back, <span>{{ user.email }}</span>
+                </div>
+                <!-- Status Badges for Vendor Context -->
+                <div class="status-indicator tag-{{ user.vendor.status|default:'pending' }}">
+                    {{ user.vendor.get_status_display|default:'Pending Setup' }}
+                </div>
+            </header>
+
+            <main class="page-body-render">
+                {% block content %}{% endblock %}
+            </main>
+
+            <!-- SAAS MINIMAL FOOTER -->
+            <footer class="dashboard-footer">
+                <div class="footer-left">
+                    &copy; 2026 Marketly Marketplace Inc. All rights reserved.
+                </div>
+                <div class="footer-right">
+                    <a href="#">Privacy Policy</a>
+                    <span class="footer-dot"></span>
+                    <a href="#">Terms of Service</a>
+                    <span class="footer-dot"></span>
+                    <a href="#">Merchant Support</a>
+                </div>
+            </footer>
+        </div>
+
+    </div>
+
+    <script src="{% static "js/vendor_base.js" %}"></script>
 </body>
 </html>

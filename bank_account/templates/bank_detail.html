@@ -1,0 +1,13 @@
+{% extends "base_vendor.html" %}
+
+{% block title %} Bank Account {% endblock  %}
+
+{% block content %}
+<p>{{bank.bank_name}}</p>
+<p>{{bank.account_holder_name}}</p>
+<p>{{bank.iban_number}}</p>
+<p>{{bank.account_type}}</p>
+<p>{{bank.account_number}}</p>
+<p>{{bank.is_verified}}</p>
+<a href="{% url "bank:update" %}">Edit</a>
+{% endblock  %}

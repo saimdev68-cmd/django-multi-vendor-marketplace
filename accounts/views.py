@@ -49,9 +49,9 @@ class LoginView(FormView):
                 if vendor and vendor.status in [Vendor.VendorStatus.ACTIVE, Vendor.VendorStatus.SUSPENDED]:
                     return redirect("vendor:dashboard")
                 elif vendor:
-                    return redirect("vendor:vendor_detail")
+                    return redirect("vendor:detail")
                 else:
-                    return redirect("vendor:vendor_create")
+                    return redirect("vendor:setup")
 
             return redirect("store:home")
 

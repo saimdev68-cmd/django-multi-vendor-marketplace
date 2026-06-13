@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Your Shop | Partner Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static "css/setup_style.css" %}">
+</head>
+<body>
+
+    <div id="toast-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="hidden-django-message" data-tags="{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="saas-container">
+        <header class="saas-header">
+            <div class="logo">Vendor<span>Hub</span></div>
+            <form action="{% url 'accounts:logout' %}" method="post" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="btn-logout">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                    Logout
+                </button>
+            </form>
+        </header>
+
+        <main class="saas-card">
+            <div class="card-header">
+                <h2>Register Your Shop</h2>
+                <p class="subtitle">Set up your vendor profile and payout details to get started.</p>
+            </div>
+
+            <div class="step-wizard">
+                <div class="step-item active" id="step-indicator-1">
+                    <span class="step-number">1</span>
+                    <span class="step-label">Vendor Profile</span>
+                </div>
+                <div class="step-line"></div>
+                <div class="step-item" id="step-indicator-2">
+                    <span class="step-number">2</span>
+                    <span class="step-label">Bank Accounts</span>
+                </div>
+            </div>
+
+            <form action="" method="post" enctype="multipart/form-data" id="multi-step-form" novalidate>
+                {% csrf_token %}
+
+                <div class="form-step active" id="step-1">
+                    <div class="form-section-title">Shop Information</div>
+                    
+                    <div class="django-form-fields">
+                        {{ vendor_form.as_p }}
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-primary" id="next-btn">
+                            Continue
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-step" id="step-2">
+                    <div class="form-section-title">Payout & Financial Details</div>
+                    
+                    <div class="django-form-fields">
+                        {{ bank_account_form.as_p }}
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="prev-btn">Back</button>
+                        <button type="submit" class="btn btn-primary">
+                            Complete Registration
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <script src="{% static "js/setup_script.js" %}"></script>
+</body>
+</html>

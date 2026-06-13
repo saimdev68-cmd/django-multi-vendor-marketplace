@@ -1,0 +1,351 @@
+/* --- Core Reset & Design Tokens --- */
+:root {
+    --bg-app: #f8fafc;
+    --bg-card: #ffffff;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --brand-primary: #2563eb;
+    --brand-primary-hover: #1d4ed8;
+    --brand-success: #10b981;
+    --brand-success-hover: #059669;
+    --brand-error: #ef4444;
+    --brand-warning: #f59e0b;
+    --brand-info: #06b6d4;
+    --border-color: #e2e8f0;
+    --radius-lg: 12px;
+    --radius-md: 8px;
+    --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.02);
+    --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background-color: var(--bg-app);
+    color: var(--text-main);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+.saas-container {
+    max-width: 680px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* --- Premium Layout Header --- */
+.saas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.saas-header .logo {
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: -0.5px;
+}
+
+.saas-header .logo span {
+    color: var(--brand-primary);
+}
+
+.btn-logout {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    padding: 8px 14px;
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.btn-logout:hover {
+    background: #fff;
+    color: var(--brand-error);
+    border-color: #fca5a5;
+}
+
+/* --- UI Card Container --- */
+.saas-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+    padding: 40px;
+}
+
+.card-header {
+    margin-bottom: 32px;
+}
+
+.card-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+}
+
+.card-header .subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+/* --- Multi-Step Stepper Wizard --- */
+.step-wizard {
+    display: flex;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.step-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: var(--transition-smooth);
+}
+
+.step-item.active {
+    color: var(--brand-primary);
+}
+
+.step-number {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8125rem;
+    font-weight: 600;
+}
+
+.step-item.active .step-number {
+    background: var(--brand-primary);
+    color: #fff;
+    border-color: var(--brand-primary);
+}
+
+.step-line {
+    flex: 1;
+    height: 2px;
+    background: var(--border-color);
+    margin: 0 16px;
+}
+
+/* --- Step Views Toggle Visibility --- */
+.form-step {
+    display: none;
+}
+
+.form-step.active {
+    display: block;
+    animation: fadeInSlide 0.4s ease forwards;
+}
+
+.form-section-title {
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+/* --- Modernizing Raw Django Forms Structure (`.as_p`) --- */
+.django-form-fields p {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.django-form-fields label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--text-main);
+}
+
+/* Target all standard Django inputs uniformly */
+.django-form-fields input[type="text"],
+.django-form-fields input[type="number"],
+.django-form-fields input[type="email"],
+.django-form-fields input[type="url"],
+.django-form-fields select,
+.django-form-fields textarea {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 0.9375rem;
+    font-family: inherit;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background-color: #fff;
+    color: var(--text-main);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-smooth);
+}
+
+.django-form-fields input:focus,
+.django-form-fields select:focus,
+.django-form-fields textarea:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+/* Django Form Errors Style Hook */
+.errorlist {
+    list-style: none;
+    margin-bottom: 6px;
+    padding: 0;
+}
+
+.errorlist li {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--brand-error);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.errorlist li::before {
+    content: "•";
+    font-size: 1.2rem;
+}
+
+/* Dynamic styling applied via JS for inputs with backend validation errors */
+.input-has-error {
+    border-color: var(--brand-error) !important;
+    background-color: #fffbfa !important;
+}
+
+.input-has-error:focus {
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1) !important;
+}
+
+/* --- Action Buttons Base Settings --- */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 32px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: inherit;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    padding: 11px 20px;
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.btn-primary {
+    background-color: var(--brand-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--brand-primary-hover);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    border-color: var(--border-color);
+    color: var(--text-muted);
+}
+
+.btn-secondary:hover {
+    background-color: #f1f5f9;
+    color: var(--text-main);
+}
+
+/* --- Top-Middle Toast Message Elements --- */
+#toast-container {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 420px;
+    pointer-events: none;
+}
+
+.toast {
+    pointer-events: auto;
+    background: #ffffff;
+    border-radius: var(--radius-md);
+    padding: 14px 20px;
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.08), 0 10px 10px -6px rgba(0,0,0,0.03);
+    border-left: 4px solid var(--brand-info);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-main);
+    transform: translateY(-20px);
+    opacity: 0;
+    animation: slideDownIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.toast.success { border-left-color: var(--brand-success); }
+.toast.error { border-left-color: var(--brand-error); }
+.toast.warning { border-left-color: var(--brand-warning); }
+.toast.info { border-left-color: var(--brand-info); }
+
+.toast-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1;
+    padding: 0 4px;
+}
+
+.toast-close:hover {
+    color: var(--text-main);
+}
+
+/* --- Keyframe Animations --- */
+@keyframes fadeInSlide {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDownIn {
+    to { transform: translateY(0) translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOutUp {
+    to { transform: translateY(-16px); opacity: 0; }
+}

@@ -11,7 +11,7 @@ class CartItemInline(admin.TabularInline):
 class CartAdmin(admin.ModelAdmin):
 
     list_display = ("buyer","created_at")
-    search_fields = ("buyer__user__email")
+    search_fields = ("buyer__user__email",)
     readonly_fields = ("created_at","updated_at")
     inlines = [CartItemInline]
 

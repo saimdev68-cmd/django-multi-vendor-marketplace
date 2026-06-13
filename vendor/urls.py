@@ -4,8 +4,8 @@ from . import views
 app_name = "vendor"
 
 urlpatterns = [
-    path("create/",views.VendorCreateView.as_view(),name="vendor_create"),
-    path("detail/",views.VendorDetailView.as_view(),name="vendor_detail"),
-    path("update/",views.VendorUpdateView.as_view(),name="vendor_update"),
+    path("setup/",views.VendorSetupView.as_view(),name="setup"),
+    path("detail/",views.VendorDetailView.as_view(),name="detail"),
+    path("update/",views.VendorUpdateView.as_view(),name="update"),
     path("dashboard/",views.VendorDashboardView.as_view(),name="vendor_dashboard")
 ]
