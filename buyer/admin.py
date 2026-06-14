@@ -5,7 +5,7 @@ from .models import Buyer
 @admin.register(Buyer)
 class BuyerAdmin(admin.ModelAdmin):
 
-    list_display = ("user","phone_number")
+    list_display = ("user",'id',"phone_number")
     search_fields = ("user__email","phone_number")
     readonly_fields = ("created_at","updated_at")
 

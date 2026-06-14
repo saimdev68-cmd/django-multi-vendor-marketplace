@@ -4,101 +4,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Vendor Dashboard{% endblock %}</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static "css/vendor_base.css" %}">
+    <title>{% block title %}Marketly Dashboard{% endblock %}</title>
+    
+    <link rel="stylesheet" href="{% static 'css/vendor_base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/product_list.css' %}">
+    <link rel="stylesheet" href="{% static 'css/vendor_order_list.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bank_detail.css' %}">
+    <link rel="stylesheet" href="{% static 'css/vendor_update.css' %}">
+    
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
 
-    <!-- Global Toast Notifications Target Container -->
-    <div id="toast-container">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="hidden-django-message" data-tags="{{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    </div>
-
-    <div class="dashboard-layout" id="dashboard-wrapper">
+    <div id="dashboard-wrapper">
         
-        <!-- SIDEBAR NAVIGATION PANEL (ASIDE) -->
-        <aside class="sidebar" id="sidebar-nav">
+        <aside class="aside-sidebar">
             <div class="sidebar-brand">
-                <div class="brand-logo">M<span>.</span></div>
-                <div class="brand-name">Marketly</div>
+                <span class="brand-text">Marketly</span>
+                <button type="button" class="sidebar-toggle-btn" id="sidebar-toggle" aria-label="Toggle Side Panel Menu">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+                </button>
             </div>
+            
+            <nav class="sidebar-nav">
+                <ul class="sidebar-menu">
+                    <li>
+                        <a href="{% url "vendor:dashboard" %}" class="sidebar-link">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
 
-            <nav class="sidebar-menu">
-                <a href="{% url 'vendor:detail' %}" class="menu-item {% if request.resolver_match.view_name == 'vendor:detail' %}active{% endif %}">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    <span class="menu-text">Vendor Profile</span>
-                </a>
+                    <li>
+                        <a href="{% url 'vendor:detail' %}" class="sidebar-link {% if request.resolver_match.view_name == 'vendor:detail' or request.resolver_match.view_name == 'vendor:update' %}active{% endif %}">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                            <span>Store Detail</span>
+                        </a>
+                    </li>
 
-                <a href="{% url 'bank:detail' %}" class="menu-item {% if request.resolver_match.view_name == 'bank:detail' %}active{% endif %}">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                    <span class="menu-text">Bank Details</span>
-                </a>
+                    <li>
+                        <a href="{% url "products:list" %}" class="sidebar-link">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                            <span>Products</span>
+                        </a>
+                    </li>
 
-                {% if user.vendor.status == 'active' or user.vendor.status == 'suspended' %}
-                <a href="#" class="menu-item">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
-                    <span class="menu-text">Analytics Dashboard</span>
-                </a>
-                {% endif %}
+                    <li>
+                        <a href="{% url "order:vendor_order_list" %}" class="sidebar-link">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                            <span>Orders</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'bank:detail' %}" class="sidebar-link {% if request.resolver_match.view_name == 'bank:detail' %}active{% endif %}">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                            <span>Bank Account</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="sidebar-link">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>Payment History</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="sidebar-link">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
             </nav>
 
-            <!-- Sidebar Actions Footer / Collapsible Toggle Anchor -->
             <div class="sidebar-footer">
-                <form action="{% url 'accounts:logout' %}" method="post" class="logout-action-form">
+                <form action="{% url 'accounts:logout' %}" method="post" class="logout-form">
                     {% csrf_token %}
-                    <button type="submit" class="btn-sidebar-logout">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-                        <span class="menu-text">Logout</span>
+                    <button type="submit" title="Logout Account Connection">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                        <span>Logout</span>
                     </button>
                 </form>
             </div>
         </aside>
 
-        <!-- MAIN LAYOUT WRAPPER PANELS -->
-        <div class="main-content-area">
-            <header class="top-context-bar">
-                <button class="toggle-collapse-btn" id="sidebar-toggle" aria-label="Toggle Navigation State">
-                    <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-                </button>
-                
-                <div class="welcome-text">
-                    Welcome back, <span>{{ user.email }}</span>
-                </div>
-                <!-- Status Badges for Vendor Context -->
-                <div class="status-indicator tag-{{ user.vendor.status|default:'pending' }}">
-                    {{ user.vendor.get_status_display|default:'Pending Setup' }}
-                </div>
-            </header>
+        <header class="top-header">
+            <button type="button" class="mobile-menu-btn" id="mobile-toggle" aria-label="Open Mobile Drawer System">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <div class="header-metadata-right"></div>
+        </header>
 
-            <main class="page-body-render">
-                {% block content %}{% endblock %}
-            </main>
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
 
-            <!-- SAAS MINIMAL FOOTER -->
-            <footer class="dashboard-footer">
-                <div class="footer-left">
-                    &copy; 2026 Marketly Marketplace Inc. All rights reserved.
-                </div>
-                <div class="footer-right">
-                    <a href="#">Privacy Policy</a>
-                    <span class="footer-dot"></span>
-                    <a href="#">Terms of Service</a>
-                    <span class="footer-dot"></span>
-                    <a href="#">Merchant Support</a>
-                </div>
-            </footer>
-        </div>
+        <footer class="dashboard-footer">
+            <p>&copy; 2026 Marketly Marketplace Platform. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#">Terms</a>
+                <a href="#">Privacy</a>
+                <a href="#">Support Hub</a>
+            </div>
+        </footer>
 
     </div>
 
-    <script src="{% static "js/vendor_base.js" %}"></script>
+    <script src="{% static 'js/vendor_base.js' %}"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

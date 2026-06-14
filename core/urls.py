@@ -25,6 +25,8 @@ urlpatterns = [
     path("accounts/",include("accounts.urls")),
     path("vendor/",include("vendor.urls")),
     path('bank/',include('bank_account.urls')),
+    path('products/',include('products.urls')),
+    path("order/",include("order.urls")),
 ]
 
 if settings.DEBUG:

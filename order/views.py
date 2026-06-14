@@ -70,7 +70,7 @@ class OrderListView(LoginRequiredMixin,ListView):
     
 class VendorOrderListView(LoginRequiredMixin,ListView):
     template_name = "vendor_order_list.html"
-    context_object_name = "orders"
+    context_object_name = "order_items"
 
     def get_queryset(self):
         return OrderItem.objects.filter(vendor=self.request.user.vendor)     

@@ -1,24 +1,21 @@
-/* --- Electric Blue Global Dashboard System Design Tokens --- */
+/* --- Design Tokens & Core Variable Architecture --- */
 :root {
-    --bg-app: #f8fafc;
-    --bg-surface: #ffffff;
-    --text-main: #0f172a;
-    --text-muted: #64748b;
-    --border-color: #e2e8f0;
-    
-    /* Active Identity Setup Blue */
     --brand-primary: #2563eb;
     --brand-primary-hover: #1d4ed8;
-    --brand-primary-light: #eff6ff;
-    
-    /* Layout Dimensions */
-    --sidebar-width-expanded: 260px;
-    --sidebar-width-collapsed: 72px;
-    
-    --radius-lg: 12px;
-    --radius-md: 8px;
-    --transition-layout: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    --shadow-subtle: 0 1px 3px 0 rgba(15, 23, 42, 0.03), 0 1px 2px 0 rgba(15, 23, 42, 0.02);
+    --brand-danger: #ef4444;
+    --brand-danger-light: #fef2f2;
+    --bg-main: #f8fafc;
+    --bg-surface: #ffffff;
+    --border-color: #e2e8f0;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --sidebar-width: 260px;
+    --sidebar-collapsed-width: 76px;
+    --header-height: 64px;
+    --transition-speed: 0.25s;
+    --timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 * {
@@ -28,535 +25,540 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, sans-serif;
-    background-color: var(--bg-app);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-main);
     color: var(--text-main);
-    overflow-x: hidden;
-    line-height: 1.5;
+    overflow-x: hidden; /* Guards body surface from layout shifts */
+    -webkit-font-smoothing: antialiased;
 }
 
-/* --- Master Grid Layout Infrastructure --- */
-.dashboard-layout {
+/* --- Layout Grid Framework --- */
+#dashboard-wrapper {
     display: grid;
-    grid-template-columns: var(--sidebar-width-expanded) 1fr;
+    grid-template-columns: var(--sidebar-width) 1fr;
+    grid-template-rows: var(--header-height) 1fr auto;
+    grid-template-areas: 
+        "sidebar header"
+        "sidebar main"
+        "sidebar footer";
     min-height: 100vh;
-    transition: var(--transition-layout);
+    transition: grid-template-columns var(--transition-speed) var(--timing-function);
 }
 
-/* Modifier applied when sidebar state class toggle handles layout widths */
-.dashboard-layout.sidebar-collapsed {
-    grid-template-columns: var(--sidebar-width-collapsed) 1fr;
+#dashboard-wrapper.sidebar-collapsed {
+    grid-template-columns: var(--sidebar-collapsed-width) 1fr;
 }
 
-/* --- Sidebar Component Architecture --- */
-.sidebar {
+/* --- Aside Sidebar System Layout (Fixes Horizontal Scroll) --- */
+.aside-sidebar {
+    grid-area: sidebar;
     background-color: var(--bg-surface);
     border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    position: sticky;
+    position: fixed;
     top: 0;
-    z-index: 100;
-    padding: 24px 16px;
-    transition: var(--transition-layout);
+    bottom: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    z-index: 40;
+    overflow-x: hidden; /* Crucial: Clips text overflow rendering container during transition scales */
+    transition: width var(--transition-speed) var(--timing-function);
 }
 
+#dashboard-wrapper.sidebar-collapsed .aside-sidebar {
+    width: var(--sidebar-collapsed-width);
+}
+
+/* --- Brand Header Layout (Fixes Unclickable Toggle Button) --- */
 .sidebar-brand {
+    height: var(--header-height);
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding-left: 12px;
-    margin-bottom: 40px;
-    overflow: hidden;
+    justify-content: space-between;
+    padding: 0 24px;
+    border-bottom: 1px solid var(--border-color);
+    transition: padding var(--transition-speed) var(--timing-function);
 }
 
-.brand-logo {
-    font-weight: 800;
-    font-size: 1.5rem;
-    color: var(--brand-primary);
-    line-height: 1;
-}
-
-.brand-name {
+.brand-text {
     font-weight: 700;
-    font-size: 1.15rem;
-    letter-spacing: -0.5px;
+    font-size: 1.125rem;
+    letter-spacing: -0.03em;
+    color: var(--text-main);
     white-space: nowrap;
-    transition: var(--transition-layout);
+    opacity: 1;
+    transition: opacity var(--transition-speed) var(--timing-function);
 }
 
-/* Menu Items Styles Framework */
+/* Collapse Transformations for Sidebar Header */
+#dashboard-wrapper.sidebar-collapsed .sidebar-brand {
+    justify-content: center;
+    padding: 0;
+}
+
+#dashboard-wrapper.sidebar-collapsed .brand-text {
+    display: none; /* Safely kills structural footprint layout math entirely */
+    opacity: 0;
+}
+
+.sidebar-toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 8px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 50;
+    transition: background-color var(--transition-speed);
+}
+
+.sidebar-toggle-btn:hover {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+}
+
+.sidebar-toggle-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* --- Sidebar Links & Navigation Elements --- */
+.sidebar-nav {
+    flex: 1;
+    padding: 24px 12px;
+    overflow-y: auto;
+}
+
 .sidebar-menu {
+    list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    flex: 1;
+    gap: 4px;
 }
 
-.menu-item {
+.sidebar-link {
     display: flex;
     align-items: center;
-    gap: 12px;
     padding: 12px;
     color: var(--text-muted);
     text-decoration: none;
-    font-size: 0.9375rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
     font-weight: 500;
-    border-radius: var(--radius-md);
-    white-space: nowrap;
-    transition: var(--transition-layout);
+    overflow: hidden; /* Keeps single item content frame bound rules */
+    transition: background-color var(--transition-speed), color var(--transition-speed), justify-content var(--transition-speed);
 }
 
-.menu-item svg {
-    flex-shrink: 0;
-}
-
-.menu-item:hover {
-    background-color: #f1f5f9;
-    color: var(--text-main);
-}
-
-.menu-item.active {
-    background-color: var(--brand-primary-light);
+.sidebar-link:hover, .sidebar-link.active {
+    background-color: var(--bg-main);
     color: var(--brand-primary);
 }
 
-/* Sidebar Collapse Control Footers */
-.sidebar-footer {
-    margin-top: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+.sidebar-link svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    flex-shrink: 0;
+    transition: margin var(--transition-speed) var(--timing-function);
 }
 
-.logout-action-form {
-    width: 100%;
+.sidebar-link span {
+    white-space: nowrap;
+    opacity: 1;
+    transition: opacity var(--transition-speed) var(--timing-function);
 }
 
-.btn-sidebar-logout {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    background: transparent;
-    border: none;
-    color: var(--text-muted);
-    font-family: inherit;
-    font-size: 0.9375rem;
-    font-weight: 500;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    text-align: left;
-    transition: var(--transition-layout);
-}
-
-.btn-sidebar-logout:hover {
-    background-color: #fff1f2;
-    color: var(--brand-error, #ef4444);
-}
-
-.toggle-collapse-btn {
-    align-self: flex-end;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background-color: #ffffff;
-    border: 1px solid var(--border-color);
-    display: flex;
-    align-items: center;
+/* Collapse Transformations for Navigation Links */
+#dashboard-wrapper.sidebar-collapsed .sidebar-link {
     justify-content: center;
-    cursor: pointer;
-    color: var(--text-muted);
-    box-shadow: var(--shadow-subtle);
-    transition: var(--transition-layout);
 }
 
-.toggle-collapse-btn:hover {
-    background-color: #f8fafc;
-    color: var(--text-main);
+#dashboard-wrapper.sidebar-collapsed .sidebar-link svg {
+    margin-right: 0;
 }
 
-/* Collapse Icon Animation State Hooks */
-.arrow-icon {
-    transition: transform 0.3s ease;
-}
-
-/* --- Collapsed Structural States Overrides --- */
-.sidebar-collapsed .brand-name,
-.sidebar-collapsed .menu-text {
+#dashboard-wrapper.sidebar-collapsed .sidebar-link span {
+    display: none; /* Destroys text layout calculations during minimal state tracking */
     opacity: 0;
-    pointer-events: none;
-    width: 0;
-    margin: 0;
 }
 
-.sidebar-collapsed .sidebar-brand,
-.sidebar-collapsed .menu-item, 
-.sidebar-collapsed .btn-sidebar-logout {
-    justify-content: center;
-    padding-left: 12px;
-}
-
-.sidebar-collapsed .toggle-collapse-btn {
-    align-self: center;
-}
-
-.sidebar-collapsed .arrow-icon {
-    transform: rotate(180deg);
-}
-
-/* --- Main Layout Panel Panels Content --- */
-.main-content-area {
+/* --- Optimized Compact Logout Action --- */
+.sidebar-footer {
+    padding: 16px;
+    border-top: 1px solid var(--border-color);
     display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+    justify-content: center;
+    transition: padding var(--transition-speed) var(--timing-function);
 }
 
-.top-context-bar {
+.logout-form {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.logout-form button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background: none;
+    border: none;
+    padding: 12px;
+    color: var(--brand-danger);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: background-color var(--transition-speed), justify-content var(--transition-speed) var(--timing-function);
+}
+
+.logout-form button:hover {
+    background-color: var(--brand-danger-light);
+}
+
+.logout-form button svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    flex-shrink: 0;
+    transition: margin var(--transition-speed) var(--timing-function);
+}
+
+.logout-form button span {
+    white-space: nowrap;
+    opacity: 1;
+    transition: opacity var(--transition-speed) var(--timing-function);
+}
+
+/* Collapse Transformations for Footer Elements */
+#dashboard-wrapper.sidebar-collapsed .sidebar-footer {
+    padding: 16px 8px;
+}
+
+#dashboard-wrapper.sidebar-collapsed .logout-form button {
+    justify-content: center;
+}
+
+#dashboard-wrapper.sidebar-collapsed .logout-form button svg {
+    margin-right: 0;
+}
+
+#dashboard-wrapper.sidebar-collapsed .logout-form button span {
+    display: none;
+    opacity: 0;
+}
+
+/* --- Top Sticky Header Navigation --- */
+.top-header {
+    grid-area: header;
+    height: var(--header-height);
     background-color: var(--bg-surface);
     border-bottom: 1px solid var(--border-color);
-    padding: 16px 40px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    position: sticky;
+    top: 0;
+    z-index: 30;
 }
 
-.welcome-text {
-    font-size: 0.9375rem;
-    color: var(--text-muted);
-}
-
-.welcome-text span {
-    font-weight: 600;
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
     color: var(--text-main);
 }
 
-/* Custom Uniform Status Tags */
-.status-indicator {
-    padding: 6px 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-radius: 50px;
-}
-.status-indicator.tag-active { background: #ecfdf5; color: #047857; }
-.status-indicator.tag-suspended { background: #fef2f2; color: #b91c1c; }
-.status-indicator.tag-pending { background: #fffbeb; color: #b45309; }
-
-.page-body-render {
-    flex: 1;
-    padding: 40px;
-    max-width: 1200px;
+/* --- Workspace Layout Area --- */
+.main-content {
+    grid-area: main;
+    padding: 40px 32px;
+    max-width: 1400px;
     width: 100%;
     margin: 0 auto;
 }
 
-/* --- Professional Minimalist Footer --- */
+/* --- Clean Professional Footer --- */
 .dashboard-footer {
+    grid-area: footer;
     background-color: var(--bg-surface);
     border-top: 1px solid var(--border-color);
-    padding: 20px 40px;
+    padding: 24px 32px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     color: var(--text-muted);
 }
 
-.footer-right {
+.footer-links {
     display: flex;
-    align-items: center;
-    gap: 16px;
+    gap: 24px;
 }
 
-.footer-right a {
+.footer-links a {
     color: var(--text-muted);
     text-decoration: none;
-    transition: color 0.2s ease;
+    transition: color var(--transition-speed);
 }
 
-.footer-right a:hover {
+.footer-links a:hover {
     color: var(--brand-primary);
 }
 
-.footer-dot {
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background-color: var(--border-color);
-}
-
-/* --- Responsive Adaptations --- */
-@media (max-width: 768px) {
-    .dashboard-layout {
-        grid-template-columns: 1fr;
-    }
-    .dashboard-layout.sidebar-collapsed {
-        grid-template-columns: 1fr;
-    }
-    .sidebar {
-        display: none; /* In a full mobile layout, you would toggle via a mobile drawer */
-    }
-    .top-context-bar, .dashboard-footer {
-        padding: 16px 20px;
-    }
-    .page-body-render {
-        padding: 20px;
-    }
-    .dashboard-footer {
-        flex-direction: column;
-        gap: 12px;
-        text-align: center;
-    }
-}
-
-/* --- Modern SaaS Vendor Detail Section Styles --- */
-.vendor-profile-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
-    width: 100%;
-}
-
-/* Fluid Aspect-Ratio Container Logic */
-.profile-hero-section {
-    background: var(--bg-surface);
+/* --- Store Detail Feature UI Styling --- */
+.vendor-profile-hero {
+    background-color: var(--bg-surface);
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
+    border-radius: 12px;
     overflow: hidden;
     box-shadow: var(--shadow-sm);
+    margin-bottom: 32px;
 }
 
 .banner-container {
-    width: 100%;
     height: 240px;
-    background: #f1f5f9;
-    position: relative;
-    overflow: hidden;
+    background-color: #f1f5f9;
 }
 
-.responsive-banner {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Crops and scales cleanly across any view width dynamically */
-}
-
-.banner-placeholder {
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-}
-
-/* Overlapping Floating Component Placement Layout Info */
-.profile-identity-bar {
-    display: flex;
-    gap: 24px;
-    padding: 0 32px 32px 32px;
-    position: relative;
-    margin-top: -48px; /* Pulls the identity layer up into the banner area safely */
-}
-
-.logo-wrapper {
-    width: 96px;
-    height: 96px;
-    border-radius: 16px;
-    background: #ffffff;
-    border: 4px solid #ffffff;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.logo-wrapper img {
+.banner-container img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.logo-initial {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--brand-primary);
+.hero-meta-wrapper {
+    padding: 0 32px 32px 32px;
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+    margin-top: -48px;
+    position: relative;
+    z-index: 10;
 }
 
-.identity-text-meta {
-    padding-top: 56px;
+.logo-container {
+    width: 110px;
+    height: 110px;
+    border-radius: 12px;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.logo-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero-text-block {
     flex: 1;
-}
-
-.title-action-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-    margin-bottom: 8px;
+    padding-bottom: 4px;
 }
 
-.store-headline {
-    font-size: 1.5rem;
+.hero-title-group h1 {
+    font-size: 1.625rem;
     font-weight: 700;
+    letter-spacing: -0.03em;
     color: var(--text-main);
-    letter-spacing: -0.5px;
+    line-height: 1.2;
 }
 
-.store-description {
-    font-size: 0.9375rem;
+.store-owner-email {
     color: var(--text-muted);
-    max-width: 720px;
+    font-size: 0.875rem;
+    margin-top: 4px;
 }
 
-/* Action Trigger Elements */
-.btn-edit-profile {
+.btn-edit {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    background-color: #ffffff;
+    background-color: var(--bg-surface);
     border: 1px solid var(--border-color);
-    padding: 8px 16px;
-    font-size: 0.875rem;
-    font-weight: 500;
     color: var(--text-main);
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
     text-decoration: none;
-    border-radius: var(--radius-md);
-    transition: var(--transition-smooth);
     box-shadow: var(--shadow-sm);
+    transition: background-color var(--transition-speed), border-color var(--transition-speed);
 }
 
-.btn-edit-profile:hover {
-    border-color: var(--brand-primary);
-    color: var(--brand-primary);
-    background-color: var(--brand-primary-light);
+.btn-edit:hover {
+    background-color: var(--bg-main);
+    border-color: #cbd5e1;
 }
 
-/* Multi-Column Data Details Framework layout grid */
-.profile-details-grid {
+.detail-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
+    grid-template-columns: 1.618fr 1fr;
+    gap: 32px;
 }
 
-.detail-card-panel {
-    background: var(--bg-surface);
+.info-card {
+    background-color: var(--bg-surface);
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
+    border-radius: 12px;
     padding: 32px;
     box-shadow: var(--shadow-sm);
 }
 
-.panel-section-title {
+.info-card h3 {
     font-size: 1rem;
     font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 24px;
     color: var(--text-main);
-    margin-bottom: 20px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--border-color);
 }
 
-.meta-data-row {
+.store-description {
+    color: #475569;
+    line-height: 1.6;
+    font-size: 0.937rem;
+}
+
+.meta-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.meta-item {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    padding: 12px 0;
+    align-items: center;
     font-size: 0.875rem;
-    border-bottom: 1px dashed #f1f5f9;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #f1f5f9;
 }
 
-.meta-data-row:last-of-type {
+.meta-item:last-child {
     border-bottom: none;
+    padding-bottom: 0;
 }
 
 .meta-label {
     color: var(--text-muted);
-    font-weight: 400;
+    font-weight: 500;
 }
 
 .meta-value {
     color: var(--text-main);
-    font-weight: 500;
-    text-align: right;
-}
-
-.address-text {
-    max-width: 240px;
-}
-
-.numeric-accent {
     font-weight: 600;
-    color: var(--brand-primary);
 }
 
-/* Micro Status Badging Profiles Component overrides */
-.status-pill {
-    display: inline-block;
-    padding: 4px 10px;
+/* UI Status Badges System */
+/* --- Master UI Status Badges System --- */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border-radius: 6px;
     font-size: 0.75rem;
     font-weight: 600;
-    border-radius: 50px;
+    line-height: 1;
     text-transform: capitalize;
+    border: 1px solid transparent; /* Prevents layout shifting */
 }
-.status-pill.status-active { background-color: #ecfdf5; color: #047857; }
-.status-pill.status-suspended { background-color: #fef2f2; color: #b91c1c; }
-.status-pill.status-pending { background-color: #fffbeb; color: #b45309; }
 
-/* Responsive Grid Adapters for smaller devices */
-@media (max-width: 1024px) {
-    .profile-details-grid {
+/* Filled Pill Design for Positive/Incoming States */
+.badge-active { 
+    background-color: #dcfce7; 
+    color: #15803d; 
+    border: 1px solid transparent;
+}
+
+.badge-pending { 
+    background-color: #fef9c3; 
+    color: #a16207; 
+    border: 1px solid transparent;
+}
+
+/* Premium Outlined Design (Pure White Background) for Restricted States */
+.badge-rejected { 
+    background-color: #ffffff; 
+    color: #ef4444; 
+    border: 1px solid #fca5a5; /* Crisp Crimson Border */
+}
+
+.badge-suspended { 
+    background-color: #ffffff; /* FIXED: Changed from dark blood red (#1e0202) to pure white */
+    color: #64748b; 
+    border: 1px solid #cbd5e1; /* Smooth Slate Border */
+}
+
+.badge-featured { 
+    background-color: #dbeafe; 
+    color: #1d4ed8; 
+    border: 1px solid transparent;
+}
+
+.badge-featured { background-color: #dbeafe; color: #1d4ed8; }
+
+/* --- Responsive Layout Configurations (<768px) --- */
+@media (max-width: 768px) {
+    #dashboard-wrapper {
+        grid-template-columns: 1fr;
+        grid-template-areas: 
+            "header"
+            "main"
+            "footer";
+    }
+    
+    .aside-sidebar {
+        transform: translateX(-100%);
+        width: 270px !important;
+        transition: transform var(--transition-speed) var(--timing-function);
+    }
+    
+    #dashboard-wrapper.mobile-sidebar-open .aside-sidebar {
+        transform: translateX(0);
+    }
+    
+    .mobile-menu-btn {
+        display: block;
+    }
+    
+    .sidebar-toggle-btn {
+        display: none;
+    }
+    
+    .detail-grid {
         grid-template-columns: 1fr;
     }
-}
-
-@media (max-width: 640px) {
-    .profile-identity-bar {
+    
+    .hero-meta-wrapper {
         flex-direction: column;
         align-items: center;
         text-align: center;
-        padding: 0 20px 20px 20px;
+        margin-top: -55px;
+        padding: 0 20px 24px 20px;
     }
-    .identity-text-meta {
-        padding-top: 12px;
-    }
-    .title-action-row {
+    
+    .hero-text-block {
         flex-direction: column;
-        gap: 12px;
-    }
-    .meta-data-row {
-        flex-direction: column;
-        gap: 4px;
-    }
-    .meta-value {
-        text-align: left;
-    }
-}
-
-/* Base styles: Keep the icon facing the right way depending on application state */
-.dashboard-layout.sidebar-collapsed .arrow-icon {
-    transform: rotate(180deg);
-}
-
-@media (max-width: 768px) {
-    .sidebar {
-        position: fixed;
-        left: -100%; /* Push completely off-screen by default on mobile */
-        width: var(--sidebar-width-expanded);
-        height: 100vh;
-        display: flex; /* Keep layout active instead of none */
-        transition: var(--transition-layout);
-    }
-
-    /* JavaScript utility hook class to slide it out over screen content */
-    .dashboard-layout.mobile-sidebar-open .sidebar {
-        left: 0;
-    }
-
-    /* Rotate the top bar button down or inversion arrow when drawer slides out */
-    .dashboard-layout.mobile-sidebar-open .arrow-icon {
-        transform: rotate(180deg);
+        gap: 16px;
+        width: 100%;
     }
 }

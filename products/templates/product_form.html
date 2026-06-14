@@ -1,11 +1,69 @@
 {% extends "base_vendor.html" %}
+{% load static %}
 
-{% block title %}Product{% endblock  %}
+{% block title %} Edit Product Parameters {% endblock %}
 
 {% block content %}
-<form action="" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{form.as_p}}
-    <button type="submit">Save</button>
-</form>
-{% endblock  %}
+<div class="form-container">
+    <h2 class="form-header-title">Modify Product Catalog Entry</h2>
+    
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        {# Extracted into structural 12-column matrix engine tracks #}
+        {{ form.as_p }}
+        
+        <div class="form-actions-group">
+            <button type="submit" class="btn-primary-submit">Save Product Updates</button>
+            <a href="{% url 'products:list' %}" class="btn-link-cancel">Discard and Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('.form-container form > p').forEach(paragraph => {
+        const fileInput = paragraph.querySelector('input[type="file"]');
+        if (!fileInput) return;
+
+        const fileLink = paragraph.querySelector('a');
+        const deleteCheckbox = paragraph.querySelector('input[type="checkbox"]');
+
+        if (fileLink) {
+            const metaContainer = document.createElement('div');
+            metaContainer.className = 'file-current-meta';
+
+            fileLink.className = 'file-link-badge';
+            fileLink.innerHTML = `🖼️ Current Asset: ${fileLink.textContent}`;
+            metaContainer.appendChild(fileLink);
+
+            if (deleteCheckbox) {
+                const deleteLabel = document.createElement('label');
+                deleteLabel.className = 'file-delete-action';
+                
+                const deleteText = document.createElement('span');
+                deleteText.textContent = 'Remove';
+                
+                deleteLabel.appendChild(deleteText);
+                deleteLabel.appendChild(deleteCheckbox);
+                metaContainer.appendChild(deleteLabel);
+            }
+
+            Array.from(paragraph.childNodes).forEach(node => {
+                if (node !== fileInput && node !== paragraph.firstElementChild) {
+                    node.remove();
+                }
+            });
+
+            paragraph.insertBefore(metaContainer, fileInput);
+        } else {
+            Array.from(paragraph.childNodes).forEach(node => {
+                if (node !== fileInput && node !== paragraph.firstElementChild && node !== paragraph.querySelector('.helptext')) {
+                    if (node.nodeType === Node.TEXT_NODE) node.remove();
+                }
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

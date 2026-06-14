@@ -3,6 +3,7 @@
 {% block title %}Order | Confirm{% endblock  %}
 
 {% block content %}
+<a href="{% url "order:vendor_order" %}">Back To Order</a>
 <p>{{order.product.name}}</p>
 <img src="{{order.product.image.url}}" width="200" height="100" alt="">
 <p>{{order.product.price}}</p>

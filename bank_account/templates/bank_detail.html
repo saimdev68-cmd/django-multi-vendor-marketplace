@@ -1,13 +1,77 @@
 {% extends "base_vendor.html" %}
 
-{% block title %} Bank Account {% endblock  %}
+{% block title %} Bank Account {% endblock %}
 
 {% block content %}
-<p>{{bank.bank_name}}</p>
-<p>{{bank.account_holder_name}}</p>
-<p>{{bank.iban_number}}</p>
-<p>{{bank.account_type}}</p>
-<p>{{bank.account_number}}</p>
-<p>{{bank.is_verified}}</p>
-<a href="{% url "bank:update" %}">Edit</a>
-{% endblock  %}
+<div class="bank-detail-container">
+    
+    <div class="bank-header-row">
+        <h2 class="bank-header-title">Settlement Bank Account</h2>
+        
+        {# Dynamic layout handling for verification status flags #}
+        {% if bank.is_verified %}
+            <span class="verification-badge verified">✓ Verified</span>
+        {% else %}
+            <span class="verification-badge pending">⟳ Verification Pending</span>
+        {% endif %}
+    </div>
+
+    <div class="bank-data-grid">
+        
+        <div class="bank-data-card holder-name">
+            <span class="field-label">Account Holder Name</span>
+            <p class="field-value">{{ bank.account_holder_name }}</p>
+        </div>
+
+        <div class="bank-data-card account-type">
+            <span class="field-label">Account Type</span>
+            <p class="field-value">{{ bank.account_type|title }}</p>
+        </div>
+
+        <div class="bank-data-card bank-name">
+            <span class="field-label">Bank Institution Name</span>
+            <p class="field-value">{{ bank.bank_name }}</p>
+        </div>
+
+        <div class="bank-data-card acc-number">
+            <span class="field-label">Account Number</span>
+            <p class="field-value data-copy-target">{{ bank.account_number }}</p>
+            <button type="button" class="btn-copy-utility" onclick="copyFinancialAsset(this)">Copy</button>
+        </div>
+
+        <div class="bank-data-card iban-number">
+            <span class="field-label">IBAN Code</span>
+            <p class="field-value data-copy-target">{{ bank.iban_number }}</p>
+            <button type="button" class="btn-copy-utility" onclick="copyFinancialAsset(this)">Copy</button>
+        </div>
+        
+    </div>
+
+    <div class="bank-actions-row">
+        <a href="{% url 'bank:update' %}" class="btn-primary-edit">Modify Account Details</a>
+    </div>
+</div>
+
+<script>
+function copyFinancialAsset(buttonElement) {
+    const dataText = buttonElement.parentNode.querySelector('.data-copy-target').textContent.trim();
+    
+    navigator.clipboard.writeText(dataText).then(() => {
+        const originalText = buttonElement.textContent;
+        buttonElement.textContent = "Copied!";
+        buttonElement.style.color = "#059669";
+        buttonElement.style.borderColor = "#a7f3d0";
+        buttonElement.style.backgroundColor = "#ecfdf5";
+        
+        setTimeout(() => {
+            buttonElement.textContent = originalText;
+            buttonElement.style.color = "";
+            buttonElement.style.borderColor = "";
+            buttonElement.style.backgroundColor = "";
+        }, 1200);
+    }).catch(err => {
+        console.error('Failed to copy secure system token: ', err);
+    });
+}
+</script>
+{% endblock %}
