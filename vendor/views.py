@@ -6,8 +6,8 @@ from .forms import VendorForm
 from bank_account.forms import BankAccountForm
 from django.shortcuts import render , redirect
 from django.urls import reverse_lazy
-from .services import VendorSetupService
-from .mixins import VendorSetupRequiredMixin , VendorDetailRequiredMixin
+from .services.setup_service import VendorSetupService
+from .mixins import VendorSetupRequiredMixin  , VendorDetailRequiredMixin , VendorDashboardRequiredMixin 
 
 class VendorSetupView(LoginRequiredMixin,VendorSetupRequiredMixin,View):
     template_name = "setup_profile.html"
@@ -21,9 +21,8 @@ class VendorSetupView(LoginRequiredMixin,VendorSetupRequiredMixin,View):
     def post(self,request):
         vendor , vendor_form , bank_account_form = VendorSetupService.create_vendor_with_bank(
             user=request.user,
-            vendor_form_data=request.POST,
-            vendor_file_data=request.FILES,
-            bank_account_form_data=request.POST
+            post_data=request.POST,
+            file_data=request.FILES
         )
         if vendor:
             return redirect ("vendor:detail")
@@ -40,17 +39,17 @@ class VendorDetailView(LoginRequiredMixin,VendorDetailRequiredMixin,DetailView):
     context_object_name = "vendor"
 
     def get_object(self, queryset=None):
-        return Vendor.objects.select_related("owner").get(owner=self.request.user)
+        return self.get_vendor()
     
-class VendorUpdateView(LoginRequiredMixin, VendorDetailRequiredMixin,UpdateView):
+class VendorUpdateView(LoginRequiredMixin,VendorDetailRequiredMixin,UpdateView):
     model = Vendor
     form_class = VendorForm
     template_name = "vendor_update.html"
     success_url = reverse_lazy("vendor:detail")
 
     def get_object(self, queryset=None):
-        return Vendor.objects.select_related("owner").get(owner=self.request.user)
+        return self.get_vendor()
     
 
-class VendorDashboardView(LoginRequiredMixin,TemplateView):
+class VendorDashboardView(LoginRequiredMixin,VendorDashboardRequiredMixin,TemplateView):
     template_name = "vendor_dashboard.html"

@@ -23,8 +23,9 @@ class VendorForm(forms.ModelForm):
                 "placeholder": "Tell customers about your storefront history, brand values, or specialty products...",
                 "rows": 6,
             }),
-            "phone_number": forms.TextInput(attrs={"placeholder": "+1234567890"}),
-            "country": forms.TextInput(attrs={"placeholder": "United States"}),
+            "phone_number": forms.TextInput(attrs={"placeholder": "e.g. +923001234567"}),
+            # FIX: Removed the custom "country" TextInput widget replacement entirely 
+            # to let django-countries render its own secure dropdown selection.
             "city": forms.TextInput(attrs={"placeholder": "New York"}),
             "address": forms.Textarea(attrs={
                 "placeholder": "Street address, suite, unit, or business office location...",
@@ -33,9 +34,9 @@ class VendorForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-
         super().__init__(*args, **kwargs)
         
+        # Premium Minimalist Design Tokens Scale
         base_css_classes = (
             "w-full px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg shadow-sm "
             "focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 "
@@ -43,7 +44,6 @@ class VendorForm(forms.ModelForm):
         )
         
         for field_name, field in self.fields.items():
-            
             if not isinstance(field.widget, (forms.CheckboxInput, forms.FileInput)):
                 field.widget.attrs.update({"class": base_css_classes})
             
@@ -66,7 +66,7 @@ class VendorForm(forms.ModelForm):
     def clean_logo(self):
         logo = self.cleaned_data.get("logo")
         if logo:
-            max_size_bytes = 2 * 1024 * 1024  
+            max_size_bytes = 2 * 1024 * 1024 
             if logo.size > max_size_bytes:
                 raise ValidationError("Store logo profile image cannot exceed 2MB in size.")
         return logo

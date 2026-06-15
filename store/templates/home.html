@@ -4,6 +4,10 @@
 
 
 {% block content %}
+<form action="{% url "accounts:logout" %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Logout</button>
+</form>
 <h1>Categories</h1>
 <a href="{% url "store:category_list" %}">View All</a>
 {% for category in categories %}

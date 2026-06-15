@@ -1,7 +1,7 @@
 from django.shortcuts import redirect
 from .models import Vendor
 
-class IsVendorMixin:
+class IsVendor:
 
     def dispatch(self,request,*args, **kwargs):
         user = request.user
@@ -9,29 +9,32 @@ class IsVendorMixin:
             return redirect ("store:home")
         return super().dispatch(request,*args, **kwargs)
     
-class VendorStoreMixin(IsVendorMixin):
-
+class VendorMixin(IsVendor):
+    def get_vendor(self):
+        if not hasattr(self.request,'_vendor_cache'):
+            self.request._vendor_cache = Vendor.objects.select_related('owner').get(owner_id=self.request.user.id)
+        return self.request._vendor_cache
+    
+class VendorStatus(IsVendor):
     def dispatch(self,request,*args, **kwargs):
         user = request.user
-        vendor = Vendor.objects.filter(owner=user)
-        if vendor:
-            if vendor.status in [Vendor.VendorStatus.ACTIVE,Vendor.VendorStatus.SUSPENDED]:
-                return redirect ("vendor:dashboard")
-            else:
-                return redirect ("vendor:detail")
+        if user.vendor.status in [Vendor.Status.PENDING,Vendor.Status.REJECTED]:
+            return redirect ("vendor:detail")
         return super().dispatch(request,*args, **kwargs)
     
-class VendorSetupMixin(IsVendorMixin):
+class VendorSetupRequiredMixin(VendorMixin):
+    
+    def dispatch(self, request, *args, **kwargs):
+        if self.get_vendor():
+            return redirect ("vendor:detail")
+        return super().dispatch(request, *args, **kwargs)
 
-    def dispatch(self,request,*args, **kwargs):
-        user = request.user
-        vendor = Vendor.objects.filter(owner=user)
-        if not vendor:
+class VendorDetailRequiredMixin(VendorMixin):
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.get_vendor():
             return redirect ("vendor:setup")
-        return super().dispatch(request,*args, **kwargs)
-        
-class VendorSetupRequiredMixin(VendorStoreMixin):
-    pass
+        return super().dispatch(request, *args, **kwargs)
 
-class VendorDetailRequiredMixin(VendorSetupMixin):
+class VendorDashboardRequiredMixin(VendorStatus):
     pass
