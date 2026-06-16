@@ -12,7 +12,7 @@ class IsVendor:
 class VendorMixin(IsVendor):
     def get_vendor(self):
         if not hasattr(self.request,'_vendor_cache'):
-            self.request._vendor_cache = Vendor.objects.select_related('owner').get(owner_id=self.request.user.id)
+            self.request._vendor_cache = Vendor.objects.select_related('owner','city','country').filter(owner_id=self.request.user.id).first()
         return self.request._vendor_cache
     
 class VendorStatus(IsVendor):

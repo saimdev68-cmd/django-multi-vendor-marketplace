@@ -24,7 +24,7 @@
         
         <div class="hero-text-block">
             <div class="hero-title-group">
-                <h1>{{ vendor.store_name }}</h1>
+                <h1>{{ vendor.name }}</h1>
                 <p class="store-owner-email">{{ vendor.owner.email }}</p>
             </div>
             
@@ -82,11 +82,11 @@
             </li>
             <li class="meta-item">
                 <span class="meta-label">Telephone Terminal</span>
-                <span class="meta-value">{{ vendor.phone_number|default:"--" }}</span>
+                <span class="meta-value">{{ vendor.phone|default:"--" }}</span>
             </li>
             <li class="meta-item">
                 <span class="meta-label">Regional Locale Zone</span>
-                <span class="meta-value">{{ vendor.city }}, {{ vendor.country }}</span>
+                <span class="meta-value">{{ vendor.city.name }}, {{ vendor.country }}</span>
             </li>
             <li class="meta-item">
                 <span class="meta-label">Physical Address</span>
@@ -95,6 +95,27 @@
             <li class="meta-item">
                 <span class="meta-label">Merchant Sign Up</span>
                 <span class="meta-value">{{ vendor.created_at|date:"M d, Y" }}</span>
+            </li>
+            <li class="meta-item">
+                <span class="meta-label">Legal Background Clearance</span>
+                <span class="meta-value">
+                    {% if vendor.is_verified %}
+                        <span class="badge badge-verified">
+                            <svg style="width:12px; height:12px; margin-right:4px;" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 1.944A11.94 11.94 0 012.183 5c-.138 2.51.522 5.016 1.91 7.149a12.042 12.042 0 005.334 4.542.75.75 0 00.546 0 12.042 12.042 0 005.334-4.542c1.388-2.133 2.048-4.64 1.91-7.149A11.94 11.94 0 0110 1.944zm3.82 5.82a.75.75 0 00-1.06-1.06L8.5 11.0 formal-math-check-style 6.47 8.97a.75.75 0 10-1.06 1.06l2.5 2.5a.75.75 0 001.06 0l4.25-4.25z" clip-rule="evenodd"/>
+                            </svg>
+                            Verified
+                        </span>
+                    {% else %}
+                        <span class="badge badge-unverified">Unverified Vault</span>
+                    {% endif %}
+                </span>
+            </li>
+            <li class="meta-item">
+                <span class="meta-label">Tax / Corporate EIN</span>
+                <span class="meta-value" style="font-family: monospace; color: #475569; letter-spacing: -0.02em;">
+                    {{ vendor.tax_identifier|default:"Not Provided" }}
+                </span>
             </li>
         </ul>
     </div>

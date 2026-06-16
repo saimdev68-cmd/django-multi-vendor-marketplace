@@ -1,7 +1,179 @@
 {% extends "base_vendor.html" %}
 
-{% block title %} Vendor | detail {% endblock  %}
+{% block title %} Vendor | Dashboard {% endblock %}
 
 {% block content %}
-<h2>Vendor Dashboard</h2>
-{% endblock  %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="dashboard-wrapper font-sans p-6 max-w-7xl mx-auto space-y-8 bg-slate-50 min-h-screen">
+    
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-gray-200 pb-4 gap-4">
+        <div>
+            <h2 class="text-2xl font-bold tracking-tight text-slate-900">Vendor Dashboard</h2>
+            <p class="text-sm text-gray-500">Real-time marketplace business intelligence tracker.</p>
+        </div>
+        
+        <div class="relative inline-block self-start sm:self-center">
+            <select id="timeframeDropdown" onchange="updateAllCharts(this.value)" class="block w-44 px-3 py-2 text-xs font-semibold text-slate-700 bg-white border border-gray-200 rounded-lg shadow-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 cursor-pointer">
+                <option value="7" selected>Past 7 Days Metrics</option>
+                <option value="28">Past 28 Days Metrics</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-white border border-gray-200 p-6 rounded-xl shadow-sm">
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Inventory Layout</h3>
+            <p class="text-2xl font-bold text-slate-800">{{ metrics.active_products }}<span class="text-gray-300 font-normal"> / {{ metrics.total_products }}</span></p>
+            <p class="text-xs text-emerald-500 mt-1">● Live Catalog Metrics</p>
+        </div>
+        
+        <div class="bg-white border border-gray-200 p-6 rounded-xl shadow-sm">
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Total Combined Revenue</h3>
+            <p class="text-2xl font-bold text-slate-800">${{ metrics.total_sales|floatformat:2 }}</p>
+            <p class="text-xs text-gray-400 mt-1">Avg Order: ${{ metrics.avg_sales_value|floatformat:2 }}</p>
+        </div>
+
+        <div class="bg-white border border-gray-200 p-6 rounded-xl shadow-sm">
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Fulfillment Metrics</h3>
+            <p class="text-2xl font-bold text-slate-800">{{ metrics.total_orders }} <span class="text-sm text-gray-400 font-medium">Orders</span></p>
+            <p class="text-xs text-amber-500 mt-1">★ {{ metrics.review_rating }} Merchant Rating</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+            <div class="mb-4">
+                <h3 class="text-sm font-bold text-slate-800">Gross Sales Revenue ($)</h3>
+                <p class="text-xs text-gray-400">Daily monetary intake trajectory pipeline.</p>
+            </div>
+            <div class="w-full relative h-[280px]">
+                <canvas id="salesDashboardChart"></canvas>
+            </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+            <div class="mb-4">
+                <h3 class="text-sm font-bold text-slate-800">Order Frequency Count</h3>
+                <p class="text-xs text-gray-400">Daily transaction volume scale trends.</p>
+            </div>
+            <div class="w-full relative h-[280px]">
+                <canvas id="ordersDashboardChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white border border-gray-200 p-6 rounded-xl shadow-sm">
+            <h3 class="text-sm font-bold text-slate-800 border-b border-gray-100 pb-2 mb-3">Performance: Past 7 Days</h3>
+            <div class="flex justify-between items-center text-sm text-gray-600">
+                <span>Sales Metrics: <strong>${{ metrics.sales_7_days|floatformat:2 }}</strong></span>
+                <span>Orders Tracked: <strong>{{ metrics.orders_7_days }}</strong></span>
+            </div>
+        </div>
+        
+        <div class="bg-white border border-gray-200 p-6 rounded-xl shadow-sm">
+            <h3 class="text-sm font-bold text-slate-800 border-b border-gray-100 pb-2 mb-3">Performance: Past 28 Days</h3>
+            <div class="flex justify-between items-center text-sm text-gray-600">
+                <span>Sales Metrics: <strong>${{ metrics.sales_28_days|floatformat:2 }}</strong></span>
+                <span>Orders Tracked: <strong>{{ metrics.orders_28_days }}</strong></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Extract backend dictionary arrays cleanly
+    const data7 = {{ chart_data_7|safe }};
+    const data28 = {{ chart_data_28|safe }};
+
+    // Keep global placeholder hooks for both visualization engines
+    let salesChartInstance = null;
+    let ordersChartInstance = null;
+
+    // Standard baseline configurations factory setup
+    const commonScalesConfig = {
+        x: {
+            grid: { display: false },
+            ticks: { font: { size: 10 }, color: '#94a3b8' }
+        },
+        y: {
+            grid: { color: '#f8fafc' },
+            ticks: { font: { size: 10 }, color: '#94a3b8' },
+            beginAtZero: true
+        }
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+        // --- 1. INITIALIZE REVENUE CHART (BLUE LINE) ---
+        const salesCtx = document.getElementById('salesDashboardChart').getContext('2d');
+        salesChartInstance = new Chart(salesCtx, {
+            type: 'line',
+            data: {
+                labels: data7.labels,
+                datasets: [{
+                    label: 'Sales Revenue ($)',
+                    data: data7.sales,
+                    borderColor: '#2563eb', // Premium Blue
+                    backgroundColor: 'rgba(37, 99, 235, 0.03)',
+                    borderWidth: 2,
+                    tension: 0.2,
+                    fill: true,
+                    pointBackgroundColor: '#2563eb'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: commonScalesConfig
+            }
+        });
+
+        // --- 2. INITIALIZE ORDERS CHART (VIBRANT PURPLE LINE) ---
+        const ordersCtx = document.getElementById('ordersDashboardChart').getContext('2d');
+        ordersChartInstance = new Chart(ordersCtx, {
+            type: 'line',
+            data: {
+                labels: data7.labels,
+                datasets: [{
+                    label: 'Orders Filled',
+                    data: data7.orders,
+                    borderColor: '#7c3aed', // Urban Streetwear Purple
+                    backgroundColor: 'rgba(124, 58, 237, 0.03)',
+                    borderWidth: 2,
+                    tension: 0.2,
+                    fill: true,
+                    pointBackgroundColor: '#7c3aed'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: commonScalesConfig
+            }
+        });
+    });
+
+    // 🔄 Unified Dropdown Trigger to Switch Data on Both Graphs
+    function updateAllCharts(daysValue) {
+        if (!salesChartInstance || !ordersChartInstance) return;
+
+        // Parse selection criteria map targets
+        const activePayload = (parseInt(daysValue) === 28) ? data28 : data7;
+
+        // Mutate Revenue Instance values
+        salesChartInstance.data.labels = activePayload.labels;
+        salesChartInstance.data.datasets[0].data = activePayload.sales;
+        salesChartInstance.update();
+
+        // Mutate Orders Instance values
+        ordersChartInstance.data.labels = activePayload.labels;
+        ordersChartInstance.data.datasets[0].data = activePayload.orders;
+        ordersChartInstance.update();
+    }
+</script>
+{% endblock %}

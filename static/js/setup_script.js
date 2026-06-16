@@ -85,4 +85,42 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    // --- 4. Dependent Country-to-City AJAX Loader ---
+    const countrySelect = document.getElementById('id_country');
+    const citySelect = document.getElementById('id_city');
+
+    if (countrySelect && citySelect) {
+        countrySelect.addEventListener('change', function() {
+            const countryId = this.value;
+
+            // Instantly clear out previous city choices and show default placeholder
+            citySelect.innerHTML = '<option value="">---------</option>';
+
+            if (!countryId) return;
+
+            // Fire asynchronous query to filter available cities dynamically
+            fetch(`/vendor/ajax/load-cities/?country_id=${countryId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    data.forEach(city => {
+                        const option = document.createElement('option');
+                        option.value = city.id;
+                        option.textContent = city.name;
+                        citySelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading localized cities:', error);
+                    if (window.showToast) {
+                        window.showToast('Failed to load cities for the selected country.', 'error');
+                    }
+                });
+        });
+    }
 });

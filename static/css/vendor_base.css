@@ -516,6 +516,8 @@ body {
 
 .badge-featured { background-color: #dbeafe; color: #1d4ed8; }
 
+
+
 /* --- Responsive Layout Configurations (<768px) --- */
 @media (max-width: 768px) {
     #dashboard-wrapper {

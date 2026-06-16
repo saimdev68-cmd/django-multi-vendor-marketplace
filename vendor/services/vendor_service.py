@@ -19,9 +19,9 @@ class VendorService:
     @staticmethod
     def create_vendor(user, **data):
         data["owner"] = user
-        data["slug"] = VendorService.generate_unique_slug(data["store_name"])
+        data["slug"] = VendorService.generate_unique_slug(data["name"])
         try:
             return Vendor.objects.create(**data)
         except IntegrityError:
-            data["slug"] = VendorService.generate_unique_slug(data["store_name"])
+            data["slug"] = VendorService.generate_unique_slug(data["name"])
             return Vendor.objects.create(**data)

@@ -1,36 +1,39 @@
 from django.contrib import admin, messages
 from django.utils.html import format_html
-from .models import Vendor
+from .models import Vendor , Country , City
 
 
 @admin.register(Vendor)
 class VendorAdmin(admin.ModelAdmin):
     
     list_display = (
-        "store_name",
+        "name",
         "id",
         "owner_email",  
         "status",
+        "is_verified",      
         "is_featured",
         "commission_rate",
         "display_logo",  
     )
 
-    list_editable = ("is_featured", "status")
+    list_editable = ("is_featured", "status", "is_verified")
 
     list_filter = (
         "status",
+        "is_verified",      
         "is_featured",
         "country",
         "created_at",
     )
 
     search_fields = (
-        "store_name",
+        "name",
         "owner__email",
         "owner__username",
-        "phone_number",
-        "city",
+        "phone",
+        "city__name",
+        "tax_identifier",   
     )
 
     readonly_fields = (
@@ -43,16 +46,16 @@ class VendorAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ("Basic Info", {
-            "fields": ("owner", "store_name", "slug", "description")
+            "fields": ("owner", "name", "slug", "description")
         }),
         ("Media Assets", {
             "fields": (("logo", "display_logo_preview"), "banner")
         }),
         ("Contact & Location Details", {
-            "fields": ("phone_number", "country", "city", "address", "get_full_address")
+            "fields": ("phone", "country", "city", "address", "get_full_address")
         }),
-        ("Business Logistics Management", {
-            "fields": ("status", "is_featured", "commission_rate")
+        ("Business & Logistics Management", {
+            "fields": ("status", "is_verified", "tax_identifier", "status_notes", "is_featured", "commission_rate")
         }),
         ("System Audit Metrics", {
             "classes": ("collapse",),  
@@ -65,7 +68,7 @@ class VendorAdmin(admin.ModelAdmin):
     actions = ["bulk_approve_vendors", "bulk_suspend_vendors"]
 
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related("owner")
+        return super().get_queryset(request).select_related("owner", "country", "city")
     
     @admin.display(ordering="owner__email", description="Owner Email")
     def owner_email(self, obj):
@@ -85,7 +88,7 @@ class VendorAdmin(admin.ModelAdmin):
 
     @admin.action(description="Mark selected vendors as ACTIVE")
     def bulk_approve_vendors(self, request, queryset):
-        updated_count = queryset.update(status=Vendor.VendorStatus.ACTIVE)
+        updated_count = queryset.update(status=Vendor.Status.ACTIVE)
         self.message_user(
             request, 
             f"Successfully activated {updated_count} vendor storefronts.", 
@@ -94,9 +97,25 @@ class VendorAdmin(admin.ModelAdmin):
 
     @admin.action(description="Mark selected vendors as SUSPENDED")
     def bulk_suspend_vendors(self, request, queryset):
-        updated_count = queryset.update(status=Vendor.VendorStatus.SUSPENDED)
+        updated_count = queryset.update(status=Vendor.Status.SUSPENDED)
         self.message_user(
             request, 
             f"Successfully suspended {updated_count} vendor storefronts.", 
             messages.WARNING
         )
+
+@admin.register(Country)
+class CountryAdmin(admin.ModelAdmin):
+    list_display = ("name", 'id',"country_code", "currency_code", "phone_prefix", "is_active")
+    list_editable = ("is_active",)
+    search_fields = ("name", "country_code")
+    ordering = ["name"]
+
+
+@admin.register(City)
+class CityAdmin(admin.ModelAdmin):
+    list_display = ("name", "country", "is_active")
+    list_editable = ("is_active",)
+    list_filter = ("country", "is_active")
+    search_fields = ("name", "country__name")
+    ordering = ["country", "name"]

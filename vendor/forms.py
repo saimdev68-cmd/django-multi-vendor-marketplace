@@ -1,46 +1,85 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Vendor
+from .models import Vendor, Country, City
 
 class VendorForm(forms.ModelForm):
     
     class Meta:
         model = Vendor
         fields = [
-            "store_name", 
+            "name", 
             "description", 
             "logo", 
             "banner", 
-            "phone_number", 
+            "phone", 
             "country", 
             "city", 
-            "address"
+            "address",
+            'tax_identifier'
         ]
+
+        labels = {
+            "name": "Legal Business Name",
+            "description": "Storefront Description",
+            "logo": "Brand Logo (Profile)",
+            "banner": "Storefront Cover Banner",
+            "phone": "Business Contact Number",
+            "country": "Operating Country",
+            "city": "Operating City",
+            "address": "Complete Business Address",
+            "tax_identifier": "Corporate Tax Registration ID",
+        }
+
+        help_text = {
+            "logo": "Upload a square brand avatar (PNG or JPG). File size cap: 2MB.",
+            "banner": "A high-resolution widescreen layout backdrop for your marketplace landing page. Max size: 5MB.",
+        }
         
         widgets = {
-            "store_name": forms.TextInput(attrs={"placeholder": "e.g. Apex Tech Shop"}),
+            "name": forms.TextInput(attrs={"placeholder": "e.g. TrendHub Store"}),
             "description": forms.Textarea(attrs={
                 "placeholder": "Tell customers about your storefront history, brand values, or specialty products...",
                 "rows": 6,
             }),
-            "phone_number": forms.TextInput(attrs={"placeholder": "e.g. +923001234567"}),
-            # FIX: Removed the custom "country" TextInput widget replacement entirely 
-            # to let django-countries render its own secure dropdown selection.
-            "city": forms.TextInput(attrs={"placeholder": "New York"}),
+            "phone": forms.TextInput(attrs={"placeholder": "e.g. +923001234567"}),
+            "country": forms.Select(),
+            "city": forms.Select(),
             "address": forms.Textarea(attrs={
                 "placeholder": "Street address, suite, unit, or business office location...",
                 "rows": 4,
             }),
+            "tax_identifier": forms.TextInput(attrs={
+            "placeholder": "e.g. TRN-7654321, NTN, or VAT ID..."}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        # Premium Minimalist Design Tokens Scale
+        self.fields["country"].queryset = Country.objects.filter(is_active=True)
+        if "country" in self.data:
+            try:
+                country_id = int(self.data.get("country"))
+                # OPTIMIZED: Added select_related("country") to prevent N+1 queries during evaluation
+                self.fields["city"].queryset = City.objects.filter(
+                    country_id=country_id, 
+                    is_active=True
+                ).select_related("country")
+            except (ValueError, TypeError):
+                self.fields["city"].queryset = City.objects.none()
+                
+        elif self.instance.pk and self.instance.country:
+            # OPTIMIZED: Pre-fetch country info when loading an existing vendor's choices
+            self.fields["city"].queryset = self.instance.country.cities.filter(
+                is_active=True
+            ).select_related("country")
+        else:
+            # If loading blank, optimize the base queryset anyway
+            self.fields["city"].queryset = City.objects.none()  
+        
         base_css_classes = (
             "w-full px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg shadow-sm "
             "focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 "
-            "transition-all duration-200 text-gray-800 placeholder-gray-400"
+            "transition-all duration-200 text-gray-800 placeholder-gray-400 cursor-pointer"
         )
         
         for field_name, field in self.fields.items():
@@ -55,13 +94,13 @@ class VendorForm(forms.ModelForm):
                              "cursor-pointer transition-colors"
                 })
 
-    def clean_store_name(self):
-        store_name = self.cleaned_data.get("store_name")
-        if store_name:
-            store_name = store_name.strip()
-            if Vendor.objects.filter(store_name__iexact=store_name).exclude(pk=self.instance.pk).exists():
+    def clean_name(self):
+        name = self.cleaned_data.get("name")
+        if name:
+            name = name.strip()
+            if Vendor.objects.filter(name__iexact=name).exclude(pk=self.instance.pk).exists():
                 raise ValidationError("A storefront with this name already exists. Please choose a unique name.")
-        return store_name
+        return name
 
     def clean_logo(self):
         logo = self.cleaned_data.get("logo")

@@ -1,0 +1,16 @@
+.badge-verified {
+    background-color: #eff6ff;
+    color: var(--brand-primary);
+    border: 1px solid #bfdbfe;
+}
+
+.badge-unverified {
+    background-color: #ffffff;
+    color: #64748b;
+    border: 1px solid var(--border-color);
+}
+
+/* System Aura States Integration for verification updates */
+.status-notes-card {
+    border-left: 3px solid var(--brand-danger) !important;
+}
