@@ -1,7 +1,7 @@
-from .models import BankAccount
+from vendor.models import BankAccount
 from django.views.generic import DetailView , UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .forms import BankAccountForm
+from vendor.forms import BankAccountForm
 from django.urls import reverse_lazy
 
 # Create your views here.

@@ -173,3 +173,28 @@
 .btn-primary-edit:hover {
     background-color: #1d4ed8;
 }
+
+/* ==========================================================================
+   MARKETLY EXTENSION: BACKEND PARITY STRUCTURAL TRACKING MAPS
+   ========================================================================== */
+
+/* 1. Flat Premium Status Badge additions for Rejected choice configurations */
+.verification-badge.rejected {
+    background-color: #fef2f2;
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+/* 2. Responsive 12-Column Grid allocations for newly introduced data attributes */
+@media (min-width: 768px) {
+    .bank-data-card.swift-bix     { grid-column: span 7; }
+    .bank-data-card.currency-tier { grid-column: span 5; }
+}
+
+/* Ensure monospace layout accuracy is extended explicitly to the new SWIFT display fields */
+.bank-data-card.swift-bix .field-value {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 1.05rem;
+    letter-spacing: -0.02em;
+    color: #1e293b;
+}

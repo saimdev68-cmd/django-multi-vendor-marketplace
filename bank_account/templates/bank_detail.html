@@ -8,9 +8,10 @@
     <div class="bank-header-row">
         <h2 class="bank-header-title">Settlement Bank Account</h2>
         
-        {# Dynamic layout handling for verification status flags #}
-        {% if bank.is_verified %}
+        {% if bank.status == 'verified' %}
             <span class="verification-badge verified">✓ Verified</span>
+        {% elif bank.status == 'rejected' %}
+            <span class="verification-badge rejected">✕ Rejected</span>
         {% else %}
             <span class="verification-badge pending">⟳ Verification Pending</span>
         {% endif %}
@@ -31,6 +32,23 @@
         <div class="bank-data-card bank-name">
             <span class="field-label">Bank Institution Name</span>
             <p class="field-value">{{ bank.bank_name }}</p>
+        </div>
+
+        <div class="bank-data-card swift-bix">
+            <span class="field-label">SWIFT / BIC Code</span>
+            <p class="field-value data-copy-target">{{ bank.swift_bix }}</p>
+            <button type="button" class="btn-copy-utility" onclick="copyFinancialAsset(this)">Copy</button>
+        </div>
+
+        <div class="bank-data-card currency-tier">
+            <span class="field-label">Settlement Currency</span>
+            <p class="field-value">
+                {% if bank.currency %}
+                    {{ bank.currency.name }} ({{ bank.currency.code|upper }})
+                {% else %}
+                    <span style="color: #64748b; font-style: italic;">Not Designated</span>
+                {% endif %}
+            </p>
         </div>
 
         <div class="bank-data-card acc-number">

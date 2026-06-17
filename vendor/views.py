@@ -1,10 +1,11 @@
 from django.views.generic import DetailView , TemplateView , UpdateView 
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Vendor , City
+from .models import Vendor 
+from store.models import City
 from django.http import JsonResponse
 from .forms import VendorForm 
-from bank_account.forms import BankAccountForm
+from .forms import BankAccountForm
 from django.shortcuts import render , redirect
 from django.urls import reverse_lazy
 from .services.setup_service import VendorSetupService

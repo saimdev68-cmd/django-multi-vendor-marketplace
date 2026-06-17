@@ -4,9 +4,28 @@ from . import views
 app_name = "cart"
 
 urlpatterns = [
-    path("",views.CartDetailView.as_view(),name="cart_detail"),
-    path("add_to_cart/<int:pk>/",views.AddToCartView.as_view(),name="add_to_cart"),
-    path("remove_from_cart/<int:pk>/",views.RemoveFromCart.as_view(),name="remove_from_cart"),
-    path("increase_quantity/<int:pk>/",views.IncreaseOuantityView.as_view(),name="increase_quantity"),
-    path("decrease_quantity/<int:pk>/",views.DecreaseOuantityView.as_view(),name="decrease_quantity"),
+    # Main resource view mapping
+    path("", views.CartDetailView.as_view(), name="detail"),
+    
+    # Action endpoints - explicit parameters passing clean resource IDs
+    path(
+        "add/<int:pk>/", 
+        views.AddToCartView.as_view(), 
+        name="add_to_cart"
+    ),
+    path(
+        "item/<int:pk>/remove/", 
+        views.RemoveFromCart.as_view(), 
+        name="remove_from_cart"
+    ),
+    path(
+        "item/<int:pk>/increase/", 
+        views.IncreaseQuantityView.as_view(), # Checked: Points to corrected Q-syntax view class
+        name="increase_quantity"
+    ),
+    path(
+        "item/<int:pk>/decrease/", 
+        views.DecreaseQuantityView.as_view(), # Checked: Points to corrected Q-syntax view class
+        name="decrease_quantity"
+    ),
 ]

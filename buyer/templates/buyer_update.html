@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %} Buyer | Update {% endblock  %}
+{% block title %} Buyer | Update {% endblock %}
 
 {% block content %}
-<h2>Update The Profile</h2>
-<form action="" method="post">
+<h2>Update Profile Details</h2>
+
+<form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{form.as_p}}
-    <button type="submit">Edit</button>
+    {{ form.as_p }}
+    <button type="submit">Save Changes</button>
 </form>
-{% endblock  %}
+{% endblock %}

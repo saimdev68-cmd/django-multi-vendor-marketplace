@@ -1,6 +1,5 @@
 from django.db import transaction
-from vendor.forms import VendorForm
-from bank_account.forms import BankAccountForm
+from vendor.forms import VendorForm , BankAccountForm
 from .vendor_service import VendorService
 
 class VendorSetupService:

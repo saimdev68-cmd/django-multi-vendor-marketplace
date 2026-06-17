@@ -1,11 +1,55 @@
 {% extends "base.html" %}
 
-{% block title %}Order | Confirm{% endblock  %}
+{% block title %}Vendor Dashboard | Manage Package #{{ vendor_order.id }}{% endblock %}
 
 {% block content %}
-<a href="{% url "order:vendor_order" %}">Back To Order</a>
-<p>{{order.product.name}}</p>
-<img src="{{order.product.image.url}}" width="200" height="100" alt="">
-<p>{{order.product.price}}</p>
-<p>Quantity : {{order.quantity}}</p>
-{% endblock  %}
+<div style="max-width: 800px; margin: 40px auto; padding: 20px;">
+    <a href="{% url 'order:vendor_order_list' %}" style="text-decoration: none; color: #666; font-weight: 600;">← Back to Shipments Ledger</a>
+    
+    <div style="background: white; border: 1px solid #e0e0e0; border-radius: 8px; margin-top: 20px; padding: 25px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px;">
+            <h3 style="margin: 0;">Fulfillment Package <strong>#{{ vendor_order.id }}</strong></h3>
+            <span style="background: #007bff; color: white; padding: 5px 12px; border-radius: 20px; font-weight: 600; font-size: 0.85rem;">
+                {{ vendor_order.get_status_display }}
+            </span>
+        </div>
+
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 25px;">
+            <h4 style="margin-top: 0; margin-bottom: 10px; color: #495057;">Delivery Logistics Destination</h4>
+            <p style="margin: 4px 0;"><strong>Customer Name:</strong> {{ vendor_order.order.name }}</p>
+            <p style="margin: 4px 0;"><strong>Phone Context:</strong> {{ vendor_order.order.phone_number }}</p>
+            <p style="margin: 4px 0;"><strong>Location:</strong> {{ vendor_order.order.city.name }}, {{ vendor_order.order.country.name }}</p>
+            <p style="margin: 4px 0;"><strong>Street Address:</strong> {{ vendor_order.order.shipping_address }}</p>
+        </div>
+
+        <h4 style="color: #333; margin-bottom: 15px;">Purchased Items From Your Store</h4>
+        {% for item in vendor_order.items.all %}
+        <div style="display: flex; align-items: center; border-bottom: 1px solid #fafafa; padding-bottom: 12px; margin-bottom: 12px;">
+            {% if item.product.image %}
+            <img src="{{ item.product.image.url }}" width="60" height="45" style="object-fit: cover; border-radius: 4px; margin-right: 15px;">
+            {% endif %}
+            <div style="flex-grow: 1;">
+                <h5 style="margin: 0 0 4px 0;">{{ item.product.name }}</h5>
+                <p style="margin: 0; color: #666; font-size: 0.85rem;">Quantity: {{ item.quantity }} × ${ {item.price }}</p>
+            </div>
+            <div style="font-weight: 600;">${{ item.total_price }}</div>
+        </div>
+        {% endfor %}
+
+        <div style="text-align: right; margin-top: 15px; padding-bottom: 25px; border-bottom: 1px solid #eee;">
+            <span style="color: #666;">Your Order Earnings:</span>
+            <strong style="font-size: 1.25rem; color: #28a745; margin-left: 10px;">${{ vendor_order.vendor_subtotal }}</strong>
+        </div>
+        
+        <div style="margin-top: 25px;">
+            <h4 style="margin-top: 0; margin-bottom: 15px;">Fulfillment Logistics Tracking</h4>
+            <p style="color: #666; font-size: 0.9rem; margin-bottom: 15px;">Add tracking identifiers once this package has been dispatched to the carrier.</p>
+            
+            <div style="display: flex; gap: 15px;">
+                <input type="text" placeholder="Carrier (e.g. FedEx, DHL)" value="{{ vendor_order.carrier_name|default:'' }}" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; flex: 1;" readonly>
+                <input type="text" placeholder="Tracking Reference ID" value="{{ vendor_order.tracking_number|default:'' }}" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; flex: 1;" readonly>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

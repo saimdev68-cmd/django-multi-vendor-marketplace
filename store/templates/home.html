@@ -12,10 +12,14 @@
 <a href="{% url "store:category_list" %}">View All</a>
 {% for category in categories %}
 <p>{{category.name}}</p>
-<img src="{{category.image.url}}" width="150" height="80" alt=""><br>
+<img src="{{category.icon.url}}" width="150" height="80" alt=""><br>
 {% endfor %}
 {% for product in products %}
 <img src="{{product.image.url}}" width="600" height="200" alt="">
-<a href="{% url "products:product_detail" product.id %}"><p>{{product.name}}</p></a>
+<a href="#"><p>{{product.name}}</p></a>
+<form action="{% url "cart:add_to_cart" product.id %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Add To Cart</button>
+</form>
 {% endfor %}
 {% endblock %}

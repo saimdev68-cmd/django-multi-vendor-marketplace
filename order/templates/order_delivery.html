@@ -1,12 +1,36 @@
 {% extends "base.html" %}
 
-{% block title %}Order | Confirm{% endblock  %}
+{% block title %}Marketly | Delivery Details{% endblock %}
 
 {% block content %}
-<h2>Delivery Detail</h2>
-<form action="" method="post">
-    {% csrf_token %}
-    {{form.as_p}}
-    <button type="submit">Next</button>
-</form>
-{% endblock  %}
+<div class="delivery-container" style="max-width: 600px; margin: 40px auto; padding: 25px; border: 1px solid #e0e0e0; border-radius: 8px; background: #fff;">
+    <h2 style="margin-bottom: 5px; color: #222;">Delivery Information</h2>
+    <p style="color: #666; margin-bottom: 25px; font-size: 0.95rem;">Specify where you want your items shipped. Different vendors will ship their items to this central address.</p>
+
+    <form action="" method="post" id="delivery-form">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div style="color: #dc3545; background-color: #f8d7da; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        {% for field in form %}
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+            <div style="color: #dc3545; font-size: 0.85rem; margin-top: 5px;">{{ field.errors }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <div style="margin-top: 30px;">
+            <button type="submit" style="width: 100%; background-color: #28a745; color: white; border: none; padding: 12px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer;">
+                Proceed to Secure Payment
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

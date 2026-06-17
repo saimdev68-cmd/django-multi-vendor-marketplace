@@ -1,9 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %} Buyer | Detail {% endblock  %}
+{% block title %} Buyer Details {% endblock %}
 
 {% block content %}
-<p>Email : {{user.email}}</p>
-<p>Phone Number :{{buyer.phone_number}}</p>
-<img src="{{buyer.profile_image.url}}" width="200" height="100" alt="">
-{% endblock  %}
+<h1>Buyer Profile Information</h1>
+
+<p><strong>Account Email:</strong> {{ user.email }}</p>
+<p><strong>Contact Phone Number:</strong> {{ buyer.phone_number }}</p>
+
+<div>
+    <p><strong>Profile Avatar Image:</strong></p>
+    <img src="{{ buyer.profile_image.url }}" width="200" height="100" alt="Buyer Profile Picture">
+</div>
+
+<p><a href="{% url 'buyer:edit' %}">Edit Profile Details</a></p>
+{% endblock %}

@@ -1,6 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Vendor, Country, City
+from .models import Vendor , BankAccount
+from store.models import Country , City , Currency , Bank
 
 class VendorForm(forms.ModelForm):
     
@@ -59,7 +60,6 @@ class VendorForm(forms.ModelForm):
         if "country" in self.data:
             try:
                 country_id = int(self.data.get("country"))
-                # OPTIMIZED: Added select_related("country") to prevent N+1 queries during evaluation
                 self.fields["city"].queryset = City.objects.filter(
                     country_id=country_id, 
                     is_active=True
@@ -68,12 +68,10 @@ class VendorForm(forms.ModelForm):
                 self.fields["city"].queryset = City.objects.none()
                 
         elif self.instance.pk and self.instance.country:
-            # OPTIMIZED: Pre-fetch country info when loading an existing vendor's choices
             self.fields["city"].queryset = self.instance.country.cities.filter(
                 is_active=True
             ).select_related("country")
         else:
-            # If loading blank, optimize the base queryset anyway
             self.fields["city"].queryset = City.objects.none()  
         
         base_css_classes = (
@@ -117,3 +115,86 @@ class VendorForm(forms.ModelForm):
             if banner.size > max_size_bytes:
                 raise ValidationError("Store banner background image cannot exceed 5MB in size.")
         return banner
+    
+class BankAccountForm(forms.ModelForm):
+    
+    currency = forms.ModelChoiceField(
+        queryset=Currency.objects.filter(is_active=True),
+        empty_label="Select Settlement Currency",
+        label="Settlement Currency",
+        required=True
+    )
+
+    bank_name = forms.ModelChoiceField(
+        queryset=Bank.objects.filter(is_active=True),
+        required=True
+    )
+
+    class Meta:
+        model = BankAccount
+        fields = [
+            "account_holder_name", 
+            "bank_name", 
+            "swift_bic", 
+            "currency",
+            "account_number", 
+            "iban_number", 
+            "account_type"
+        ]
+        
+        labels = {
+            "account_holder_name": "Account Holder Name",
+            "bank_name": "Financial Institution Name",
+            "swift_bix": "SWIFT / BIC Code",
+            "account_number": "Account Number",
+            "iban_number": "International Bank Account Number (IBAN)",
+            "account_type": "Account Type Classification"
+        }
+        
+        widgets = {
+            "account_holder_name": forms.TextInput(attrs={"placeholder": "e.g. Jane Doe / Company Name"}),
+            "bank_name": forms.Select(),
+            "swift_bix": forms.TextInput(attrs={"placeholder": "e.g. KCBAUS33XXX"}),
+            "account_number": forms.TextInput(attrs={"placeholder": "Enter account number digits"}),
+            "iban_number": forms.TextInput(attrs={"placeholder": "e.g. GB29UKBU12345678901234"}),
+            "account_type": forms.Select()
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        base_css_classes = (
+            "w-full px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg shadow-sm "
+            "focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 "
+            "transition-all duration-200 text-gray-800 placeholder-gray-400"
+        )
+        
+        for field_name, field in self.fields.items():
+            field.widget.attrs.update({"class": base_css_classes})
+
+    def clean_account_holder_name(self):
+        
+        name = self.cleaned_data.get("account_holder_name")
+        if name:
+            return name.strip().title()
+        return name
+
+    def clean_swift_bix(self):
+        
+        swift = self.cleaned_data.get("swift_bix")
+        if swift:
+            return swift.replace(" ", "").upper()
+        return swift
+
+    def clean_iban_number(self):
+       
+        iban = self.cleaned_data.get("iban_number")
+        if iban:
+            return iban.replace(" ", "").upper()
+        return iban
+
+    def clean_account_number(self):
+        
+        account_number = self.cleaned_data.get("account_number")
+        if account_number:
+            return account_number.replace(" ", "").replace("-", "").upper()
+        return account_number

@@ -1,14 +1,47 @@
 {% extends "base.html" %}
 
-{% block title %}Order | Confirm{% endblock  %}
+{% block title %}Marketly | My Orders{% endblock %}
 
 {% block content %}
-{% for order in orders %}
-    {% for item in order.items.all %}
-    <p>{{item.product.name}}</p>
-    <img src="{{item.product.image.url}}" width="200" height="100" alt="">
-    <p>{{item.product.price}}</p>
-    <p>Quantity : {{item.quantity}}</p>
-    {% endfor %}
-{% endfor %}
-{% endblock  %}
+<div style="max-width: 900px; margin: 40px auto; padding: 20px;">
+    <h2 style="margin-bottom: 25px;">Your Order History</h2>
+
+    {% if not orders %}
+    <p style="color: #666; text-align: center; padding: 40px; background: #f9f9f9; border-radius: 6px;">You haven't placed any orders yet.</p>
+    {% else %}
+        {% for order in orders %}
+        <div style="background: white; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 25px; overflow: hidden;">
+            <div style="background-color: #f8f9fa; padding: 15px 20px; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between;">
+                <div>
+                    <span style="color: #666; margin-right: 20px;">Date: <strong>{{ order.created_at|date:"M d, Y" }}</strong></span>
+                    <span style="color: #666;">Order ID: <strong>#{{ order.id }}</strong></span>
+                </div>
+                <div>
+                    <span style="color: #666; margin-right: 15px;">Payment:</span>
+                    <span style="font-weight: 700; color: {% if order.payment_status == 'paid' %}#28a745{% else %}#dc3545{% endif %};">
+                        {{ order.get_payment_status_display }}
+                    </span>
+                </div>
+            </div>
+            
+            <div style="padding: 20px;">
+                <p style="margin: 0 0 15px 0; color: #555;">Contains <strong>{{ order.vendor_orders.count }}</strong> merchant shipment packages:</p>
+                <ul style="padding-left: 20px; margin: 0;">
+                    {% for vo in order.vendor_orders.all %}
+                    <li style="margin-bottom: 8px; color: #333;">
+                        Package from <strong>{{ vo.vendor.name }}</strong> — Status: 
+                        <span style="color: #007bff; font-weight: 600;">{{ vo.get_status_display }}</span> (${{ vo.vendor_subtotal }})
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            
+            <div style="background-color: #fdfdfd; padding: 12px 20px; border-top: 1px solid #f0f0f0; text-align: right;">
+                <span style="color: #666; font-size: 0.95rem;">Total Amount Paid:</span>
+                <strong style="margin-left: 10px; font-size: 1.1rem; color: #111;">${{ order.total_amount }}</strong>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

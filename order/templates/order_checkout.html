@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Marketly | Secure Checkout{% endblock %}
+
+{% block content %}
+<div class="checkout-container" style="max-width: 600px; margin: 40px auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+    <h2 style="margin-bottom: 10px;">Secure Checkout</h2>
+    <p style="color: #666; margin-bottom: 25px;">Complete your purchase securely via Stripe Elements.</p>
+
+    <div class="order-summary-box" style="background-color: #f9f9f9; padding: 15px; border-radius: 6px; margin-bottom: 25px;">
+        <span style="font-weight: 600; color: #333;">Grand Total:</span>
+        <span style="float: right; font-weight: 700; color: #111; font-size: 1.2rem;">${{ total_amount }}</span>
+    </div>
+
+    <div id="payment-errors" style="color: #dc3545; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; border-radius: 4px; margin-bottom: 20px; display: none;"></div>
+
+    {% if client_secret %}
+    <form id="payment-form" action="{% url 'order:process_payment' %}" method="POST">
+        {% csrf_token %}
+        
+        <input type="hidden" name="payment_intent_id" id="stripe-payment-intent-id">
+
+        <div id="link-authentication-element" style="margin-bottom: 20px;"></div>
+        <div id="payment-element" style="margin-bottom: 25px;"></div>
+
+        <button id="submit-button" type="submit" style="width: 100%; background-color: #007bff; color: white; border: none; padding: 12px 20px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s ease;">
+            <span id="button-text">Authorize Payment (${{ total_amount }})</span>
+            <span id="spinner" style="display: none;">Processing Transaction...</span>
+        </button>
+    </form>
+    {% else %}
+    <div style="text-align: center; color: #dc3545; padding: 20px;">
+        <p>Unable to securely connect to the billing infrastructure gateway. Please check your system logs or refresh the interface.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const stripePublicKey = "{{ stripe_publishable_key }}";
+        const clientSecret = "{{ client_secret }}";
+
+        if (!clientSecret || !stripePublicKey) return;
+
+        // Initialize Stripe SDK Core Driver
+        const stripe = Stripe(stripePublicKey);
+        
+        // Pass the explicit client secret layout options configuration context down
+        const options = {
+            clientSecret: clientSecret,
+            appearance: {
+                theme: 'stripe',
+                variables: { colorPrimary: '#007bff' }
+            }
+        };
+
+        const elements = stripe.elements(options);
+
+        // Mount the standard payment fields elements safely onto DOM anchors
+        const paymentElement = elements.create("payment");
+        paymentElement.mount("#payment-element");
+
+        const linkAuthenticationElement = elements.create("linkAuthentication");
+        linkAuthenticationElement.mount("#link-authentication-element");
+
+        // Form processing interface handler rules
+        const form = document.getElementById("payment-form");
+        const submitButton = document.getElementById("submit-button");
+        const buttonText = document.getElementById("button-text");
+        const spinner = document.getElementById("spinner");
+        const errorContainer = document.getElementById("payment-errors");
+
+        form.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            setLoading(true);
+
+            // Trigger asynchronous front-side payment validation mapping steps
+            const { error, paymentIntent } = await stripe.confirmPayment({
+                elements,
+                confirmParams: {
+                    // Stripe requires a redirection path target for complex 3D-Secure verifications.
+                    // We set it back to this checkout index page to evaluate errors gracefully if needed.
+                    return_url: window.location.href,
+                },
+                redirect: "if_required" // Captures standard credit card clearances locally inside this window frame!
+            });
+
+            if (error) {
+                // Display user-friendly transactional error copy straight from Stripe's payload engine
+                errorContainer.textContent = error.message;
+                errorContainer.style.display = "block";
+                setLoading(false);
+            } else if (paymentIntent && paymentIntent.status === "succeeded") {
+                // If authorization maps cleanly, pass the secret back down to our core django views pipeline block
+                document.getElementById("stripe-payment-intent-id").value = paymentIntent.id;
+                form.submit();
+            } else {
+                errorContainer.textContent = "An unexpected multi-factor confirmation anomaly occurred. Please try again.";
+                errorContainer.style.display = "block";
+                setLoading(false);
+            }
+        });
+
+        // Toggle programmatic layout tracking feedback states seamlessly
+        function setLoading(isLoading) {
+            if (isLoading) {
+                submitButton.disabled = true;
+                buttonText.style.display = "none";
+                spinner.style.display = "inline";
+                errorContainer.style.display = "none";
+            } else {
+                submitButton.disabled = false;
+                buttonText.style.display = "inline";
+                spinner.style.display = "none";
+            }
+        }
+    });
+</script>
+{% endblock %}

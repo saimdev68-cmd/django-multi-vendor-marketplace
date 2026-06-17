@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Marketly | Write a Review{% endblock %}
+
+{% block content %}
+<div class="review-page-container" style="max-width: 600px; margin: 40px auto; padding: 25px; border: 1px solid #e0e0e0; border-radius: 8px; background: #fff; font-family: system-ui, sans-serif;">
+    <h2 style="margin-top: 0; margin-bottom: 5px; color: #111;">Write a Review</h2>
+    <p style="color: #666; margin-bottom: 25px; font-size: 0.95rem;">Your review will be marked as a <strong>Verified Purchase</strong>.</p>
+
+    <div style="display: flex; align-items: center; background-color: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 25px; gap: 15px; border: 1px solid #eee;">
+        {% if item.product.image %}
+        <img src="{{ item.product.image.url }}" width="90" height="70" style="object-fit: cover; border-radius: 4px;" alt="{{ item.product.name }}">
+        {% endif %}
+        <div>
+            <h4 style="margin: 0 0 4px 0; color: #222;">{{ item.product.name }}</h4>
+            <p style="margin: 0; color: #666; font-size: 0.85rem;">Sold by: {{ item.product.vendor.name }}</p>
+        </div>
+    </div>
+
+    <form action="" method="post" id="review-submission-form">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div style="color: #dc3545; background-color: #f8d7da; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        {% for field in form %}
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+            <div style="color: #dc3545; font-size: 0.85rem; margin-top: 5px;">{{ field.errors }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <div style="margin-top: 30px; display: flex; gap: 15px;">
+            <a href="{% url 'order:order_list' %}" style="flex: 1; text-align: center; background-color: #e0e0e0; color: #333; padding: 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 1rem;">
+                Cancel
+            </a>
+            <button type="submit" style="flex: 2; background-color: #007bff; color: white; border: none; padding: 12px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer;">
+                Submit Verified Review
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

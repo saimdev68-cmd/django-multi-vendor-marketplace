@@ -17,7 +17,7 @@ class BuyerUpdateView(LoginRequiredMixin, UpdateView):
     model = Buyer
     form_class = BuyerForm
     template_name = "buyer_update.html"
-    success_url = reverse_lazy("buyer:buyer_detail")
+    success_url = reverse_lazy("buyer:detail")
 
     def get_object(self):
         return self.request.user.buyer

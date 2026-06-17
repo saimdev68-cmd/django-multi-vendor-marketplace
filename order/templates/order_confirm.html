@@ -1,12 +1,42 @@
 {% extends "base.html" %}
 
-{% block title %}Order | Confirm{% endblock  %}
+{% block title %}Marketly | Confirm Your Order{% endblock %}
 
 {% block content %}
-{% for item in items %}
-<p>{{item.product.name}}</p>
-<img src="{{item.product.image.url}}" width="200" height="100" alt="">
-<p>{{item.product.price}}</p>
-<p>Quantity : {{item.quantity}}</p>
-{% endfor %}
-{% endblock  %}
+<div class="checkout-review-container" style="max-width: 800px; margin: 40px auto; padding: 20px; font-family: system-ui, -apple-system, sans-serif;">
+    <h2 style="margin-bottom: 5px; color: #111;">Review Your Order</h2>
+    <p style="color: #666; margin-bottom: 30px; font-size: 0.95rem;">Please inspect your items carefully before specifying delivery logistics metrics.</p>
+
+    <div class="items-list-wrapper" style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background: #fff; margin-bottom: 30px;">
+        {% for item in items %}
+        <div class="item-row" style="display: flex; align-items: center; padding: 20px; border-bottom: 1px solid #eee; gap: 20px;">
+            {% if item.product.image %}
+            <img src="{{ item.product.image.url }}" width="120" height="90" style="object-fit: cover; border-radius: 6px; border: 1px solid #eaeaea;" alt="{{ item.product.name }}">
+            {% endif %}
+            
+            <div style="flex-grow: 1;">
+                <h4 style="margin: 0 0 6px 0; color: #222; font-size: 1.1rem;">{{ item.product.name }}</h4>
+                <p style="margin: 0 0 4px 0; color: #666; font-size: 0.9rem;">Merchant: <strong style="color: #444;">{{ item.product.vendor.name }}</strong></p>
+                <p style="margin: 0; color: #888; font-size: 0.85rem;">Unit Price: ${{ item.product.price }}</p>
+            </div>
+
+            <div style="text-align: right; min-width: 120px;">
+                <p style="margin: 0 0 4px 0; color: #555; font-size: 0.9rem;">Qty: <strong>{{ item.quantity }}</strong></p>
+                <strong style="font-size: 1.1rem; color: #111;">${{ item.total_price }}</strong>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; background-color: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e9ecef;">
+        <div>
+            <span style="color: #666; font-size: 0.95rem; display: block; margin-bottom: 2px;">Estimated Items Total:</span>
+            <strong style="font-size: 1.6rem; color: #111;">${{ cart.total_price }}</strong>
+        </div>
+        
+        <a href="{% url 'order:order_delivery' %}" class="btn-proceed" style="background-color: #28a745; color: white; padding: 14px 28px; border-radius: 6px; font-weight: 600; text-decoration: none; font-size: 1rem; transition: background-color 0.15s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            Provide Shipping Address →
+        </a>
+    </div>
+</div>
+{% endblock %}

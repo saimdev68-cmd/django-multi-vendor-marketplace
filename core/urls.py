@@ -24,10 +24,10 @@ urlpatterns = [
     path("__debug__/",include("debug_toolbar.urls")),
     path("accounts/",include("accounts.urls")),
     path("vendor/",include("vendor.urls")),
-    path('bank/',include('bank_account.urls')),
     path('products/',include('products.urls')),
     path("order/",include("order.urls")),
-    path("",include("store.urls"))
+    path("",include("store.urls")),
+    path("cart/",include("cart.urls"))
 ]
 
 if settings.DEBUG:

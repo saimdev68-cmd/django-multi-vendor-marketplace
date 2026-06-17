@@ -1,100 +1,45 @@
-{% extends "base_vendor.html" %}
-{% load static %}
+{% extends "base.html" %}
 
-{% block title %}Vendor Orders | Confirm Management{% endblock %}
+{% block title %}Vendor Dashboard | Orders{% endblock %}
 
 {% block content %}
-<div class="vendor-dashboard-container">
-    <header class="dashboard-header">
-        <div class="header-meta">
-            <h1>Incoming Customer Orders</h1>
-            <p class="subtitle">Review, confirm, and manage item logistics operations.</p>
-        </div>
-    </header>
+<div style="max-width: 1000px; margin: 40px auto; padding: 20px;">
+    <h2 style="margin-bottom: 10px;">Merchant Shipment Fulfillments</h2>
+    <p style="color: #666; margin-bottom: 30px;">Manage item packaging pipelines, tracking workflows, and return statuses for your storefront products.</p>
 
-    {% if order_items %}
-        <div class="order-matrix-grid">
-            {% for item in order_items %}
-                <article class="order-crisp-card">
-                    
-                    <div class="card-media-wrapper">
-                        {% if item.product.image %}
-                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="product-reference-image">
-                        {% else %}
-                            <div class="product-fallback-image">No Image Available</div>
-                        {% endif %}
-                        
-                        <div class="card-badge-overlay-container">
-                            <span class="status-pill status-{{ item.order.status }}">
-                                {{ item.order.get_status_display }}
-                            </span>
-                            <span class="quantity-pill">
-                                Qty: {{ item.quantity }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="card-body-content">
-                        <div class="product-identity">
-                            <span class="category-micro-label">Fashion & Apparel</span>
-                            <h3 class="product-title">{{ item.product.name }}</h3>
-                            <p class="buyer-attribution">Customer: <span>{{ item.order.name }}</span></p>
-                        </div>
-
-                        <div class="pricing-metrics-row">
-                            <div class="metric-block">
-                                <span class="metric-label">Unit Price</span>
-                                <span class="metric-value">${{ item.price }}</span>
-                            </div>
-                            <div class="metric-block total-span">
-                                <span class="metric-label">Subtotal</span>
-                                <span class="metric-value-accent">${{ item.total_price }}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <footer class="card-action-footer">
-                        <a href="{% url "order:vendor_order_detail" item.id %}" class="btn btn-secondary-text">View Detail</a>
-                        
-                        {% if item.order.status == 'pending' %}
-                            <form action="#" method="post" class="action-inline-form">
-                                {% csrf_token %}
-                                <input type="hidden" name="order_item_id" value="{{ item.id }}">
-                                <button type="submit" class="btn btn-secondary-outline">Confirm Order</button>
-                            </form>
-                        {% else %}
-                            <a href="#" class="btn btn-secondary-outline-disabled">View Details</a>
-                        {% endif %}
-                    </footer>
-                </article>
-            {% endfor %}
-        </div>
-
-        {% if is_paginated %}
-            <nav class="pagination-nav-container">
-                <div class="pagination-controls">
-                    {% if page_obj.has_previous %}
-                        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="pag-btn">Previous</a>
-                    {% else %}
-                        <span class="pag-btn disabled">Previous</span>
-                    {% endif %}
-
-                    <span class="pag-indicator">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-
-                    {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="pag-btn">Next</a>
-                    {% else %}
-                        <span class="pag-btn disabled">Next</span>
-                    {% endif %}
-                </div>
-            </nav>
-        {% endif %}
-
+    {% if not vendor_orders %}
+    <p style="color: #666; text-align: center; padding: 40px; background: #f9f9f9; border-radius: 6px;">No customers have ordered products from your catalog yet.</p>
     {% else %}
-        <div class="empty-state-fallback">
-            <p class="fallback-title">No orders found</p>
-            <p class="fallback-subtitle">When customers purchase items assigned to your profile, they will assemble here.</p>
-        </div>
+    <table style="width: 100%; border-collapse: collapse; background: white; border: 1px solid #e0e0e0; border-radius: 6px;">
+        <thead>
+            <tr style="background-color: #f4f6f9; text-align: left; border-bottom: 2px solid #e0e0e0;">
+                <th style="padding: 12px 15px;">Package ID</th>
+                <th style="padding: 12px 15px;">Global Order Reference</th>
+                <th style="padding: 12px 15px;">Recipient Customer</th>
+                <th style="padding: 12px 15px;">Your Earnings Subtotal</th>
+                <th style="padding: 12px 15px;">Logistics Status</th>
+                <th style="padding: 12px 15px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for vo in vendor_orders %}
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 12px 15px; font-weight: 600;">#{{ vo.id }}</td>
+                <td style="padding: 12px 15px; color: #666;">#{{ vo.order.id }}</td>
+                <td style="padding: 12px 15px;">{{ vo.order.name }}</td>
+                <td style="padding: 12px 15px; font-weight: 600; color: #28a745;">${{ vo.vendor_subtotal }}</td>
+                <td style="padding: 12px 15px;">
+                    <span style="font-weight: 600; color: {% if vo.status == 'delivered' %}#28a745{% elif vo.status == 'returned' %}#dc3545{% else %}#007bff{% endif %};">
+                        {{ vo.get_status_display }}
+                    </span>
+                </td>
+                <td style="padding: 12px 15px;">
+                    <a href="{% url 'order:vendor_order_detail' vo.id %}" style="color: #007bff; font-weight: 600; text-decoration: none;">Manage Package →</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
     {% endif %}
 </div>
 {% endblock %}

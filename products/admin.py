@@ -1,9 +1,10 @@
 from django.contrib import admin
-from .models import Category , Product
- 
+from django.contrib import messages
+from .models import Category, Product
+
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    # 1. Structured Layout Panels (Fieldsets)
     fieldsets = (
         ("Core Taxonomy Details", {
             "fields": ("name", "slug", "icon"),
@@ -11,12 +12,11 @@ class CategoryAdmin(admin.ModelAdmin):
         }),
         ("Status & Permissions", {
             "fields": ("is_active",),
-            "classes": ("collapse",),  # Can be expanded or collapsed by the admin
+            "classes": ("collapse",),
             "description": "Control the visibility of this category across Marketly stores.",
         }),
     )
 
-    # 2. Layout Columns for List Dashboard
     list_display = (
         "id",
         "name",
@@ -25,24 +25,20 @@ class CategoryAdmin(admin.ModelAdmin):
         "created_at",
     )
     
-    # 3. Quick Global Quality-of-Life Toggles
     list_editable = ("is_active",)
-    
-    # 4. Optimized Filter & Search Components
     list_filter = ("is_active", "created_at")
     search_fields = ("name", "slug", "=id")
-    
-    # 5. Real-Time UI Mirroring Configuration
     prepopulated_fields = {"slug": ("name",)}
-    
-    # 6. Performance & Scale Optimizations
     ordering = ("-created_at",)
     show_full_result_count = False
 
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    list_select_related = ["vendor", "category"]
 
     list_display = (
+        "sku",
         "name",
         "vendor",
         "category",
@@ -62,20 +58,21 @@ class ProductAdmin(admin.ModelAdmin):
     )
 
     search_fields = (
+        "sku",
         "name",
-        "vendor__store_name",
+        "vendor__store_name",  
         "category__name",
     )
 
-    prepopulated_fields = {"slug": ("name",)}
-
     readonly_fields = (
+        "slug",
+        "sku",
         "created_at",
         "updated_at",
     )
 
     fieldsets = (
-        ("Basic Info", {
+        ("Basic Identification", {
             "fields": (
                 "vendor",
                 "category",
@@ -85,23 +82,45 @@ class ProductAdmin(admin.ModelAdmin):
                 "image",
             )
         }),
-        ("Pricing & Stock", {
+        ("Financial Inventory Matrix", {
             "fields": (
+                "sku",
                 "price",
                 "discount_price",
                 "stock"
             )
         }),
-        ("Control", {
+        ("Compliance & Visibility Control", {
             "fields": (
                 "status",
                 "is_featured",
             )
         }),
-        ("Timestamps", {
+        ("System Meta Timestamps", {
+            "classes": ("collapse",),
             "fields": (
                 "created_at",
                 "updated_at",
             )
         }),
     )
+
+    actions = ["approve_products", "reject_products"]
+
+    @admin.action(description="Approve selected listings and publish to marketplace")
+    def approve_products(self, request, queryset):
+        updated_count = queryset.update(status=Product.ProductStatus.ACTIVE)
+        self.message_user(
+            request, 
+            f"Successfully updated status to Active for {updated_count} marketplace listings.",
+            messages.SUCCESS
+        )
+
+    @admin.action(description="Reject selected listings and suspend from marketplace")
+    def reject_products(self, request, queryset):
+        updated_count = queryset.update(status=Product.ProductStatus.REJECTED)
+        self.message_user(
+            request, 
+            f"Successfully updated status to Rejected for {updated_count} marketplace listings.",
+            messages.WARNING
+        )

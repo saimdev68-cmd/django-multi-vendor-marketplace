@@ -6,6 +6,9 @@ from .forms import ProductForm
 from vendor.models import Vendor
 from django.urls import reverse_lazy
 from django.db.models import Q
+from django.contrib import messages
+from .services.product_service import ProductService
+from django.http import HttpResponseRedirect
 
 class ProductListView(LoginRequiredMixin,ListView):
     template_name = "product_list.html"
@@ -50,16 +53,30 @@ class ProductListView(LoginRequiredMixin,ListView):
         context['status_choices'] = Product.ProductStatus.choices
         
         return context
-    
-class ProductCreateView(LoginRequiredMixin,CreateView):
+
+class ProductCreateView(LoginRequiredMixin, CreateView):
     template_name = "product_form.html"
     model = Product
     form_class = ProductForm
-    success_url = reverse_lazy("products:list")
 
     def form_valid(self, form):
-        form.instance.vendor = self.request.user.vendor
-        return super().form_valid(form)
+
+        vendor = self.request.user.vendor
+        image_file = self.request.FILES.get('image')
+
+        try:
+            self.object = ProductService.create_product_service(
+                vendor=vendor,
+                cleaned_data=form.cleaned_data,
+                image_file=image_file
+            )
+            
+            messages.success(self.request, f"Product '{self.object.name}' successfully published with SKU: {self.object.sku}")
+            return redirect ("products:list")
+            
+        except Exception as e:
+            form.add_error(None, f"An operational error occurred during processing: {str(e)}")
+            return self.form_invalid(form)
     
 class ProductUpdateView(LoginRequiredMixin,UpdateView):
     template_name = "product_form.html"
